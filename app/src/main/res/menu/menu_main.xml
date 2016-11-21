@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.nicola.monitor_10.MainActivity">
+
+
+
+
+    <item
+        android:id="@+id/refresh"
+        android:icon="@drawable/refresh"
+        android:title="refresh"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/stato"
+        android:icon="@android:drawable/ic_media_play"
+        android:title="play/stop"
+        app:showAsAction="ifRoom"/>
+
+    <!--<item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />-->
+</menu>

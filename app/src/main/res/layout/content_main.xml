@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.nicola.monitor_10.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+
+    <TableLayout
+        android:id="@+id/tabellaValori"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:stretchColumns="1"
+        >
+        <TableRow>
+
+            <TextView
+                android:text="Id"
+                android:layout_column="1"
+                android:padding="3dip"
+                android:id="@+id/idlabel"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#757575"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:text="Light"
+                android:layout_column="2"
+                android:padding="3dip"
+                android:id="@+id/lightlabel"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#757575"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="Sound"
+                android:layout_column="3"
+                android:padding="3dip"
+                android:id="@+id/soundlabel"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#757575"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="Movement"
+                android:layout_column="4"
+                android:padding="3dip"
+                android:id="@+id/movlabel"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#757575"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:text="Charging"
+                android:layout_column="5"
+                android:padding="3dip"
+                android:id="@+id/charginglabel"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#757575"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="Locked"
+                android:layout_column="6"
+                android:padding="3dip"
+                android:id="@+id/locklabel"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#757575"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+        </TableRow>
+
+        <TableRow>
+            <View
+                android:layout_column="1"
+                android:layout_span="6"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#757575"
+                />
+        </TableRow>
+        <TableRow>
+            <ListView
+                android:layout_span="7"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/listaValori" />
+        </TableRow>
+
+    </TableLayout>
+
+
+</RelativeLayout>

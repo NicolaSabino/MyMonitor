@@ -1,6 +1,5 @@
-![logo](https://raw.githubusercontent.com/NicolaSabino/Monitor_1.0/master/app/src/main/res/mipmap-xhdpi/ic_launcher.png)
-#Monitor_1.0
-![immagineTelefono] (https://raw.githubusercontent.com/NicolaSabino/Monitor_1.0/master/LG-Nexus-5-Black2.jpg)
+
+![immagine] (https://raw.githubusercontent.com/NicolaSabino/Monitor_1.0/master/immagine%20di%20presentazione%20app.png)
 
 
 **Progetto di tirocinio presso il laboratorio di telecomunicazioni dell'Università politecnico delle marche**

@@ -3,6 +3,7 @@
 
 
 **Progetto di tirocinio presso il laboratorio di telecomunicazioni dell'Università politecnico delle marche**
+
 Il target è la realizzazione di un software che adopera acquisizione dati ad intervalli regolari e che permetta una rapida visualizzazione all'utente. Inoltre è anche prevista una minima interazione attraverso un UI minimale.
 
 Revisionato da

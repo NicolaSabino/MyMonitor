@@ -16,10 +16,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,9 +35,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*this.play = (MenuView.ItemView) findViewById(R.id.play);
-        this.pause = (MenuView.ItemView) findViewById(R.id.pause);*/
-        //this.s = (MenuView.ItemView) findViewById(R.id.stato);
 
         fab     = (FloatingActionButton) findViewById(R.id.fab);
         stato   = false;

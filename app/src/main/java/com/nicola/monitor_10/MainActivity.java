@@ -195,8 +195,8 @@ public class MainActivity extends AppCompatActivity {
                 //stampo le informazioni nella riga della tabella
                 TextView elem0 = (TextView) v.findViewById(R.id.idContent);
                 TextView elem1 = (TextView) v.findViewById(R.id.lightContent);
-                TextView elem2 = (TextView) v.findViewById(R.id.soundContent);
-                TextView elem3 = (TextView) v.findViewById(R.id.movContent);
+                TextView elem2 = (TextView) v.findViewById(R.id.movContent);
+                TextView elem3 = (TextView) v.findViewById(R.id.soundContent);
                 TextView elem4 = (TextView) v.findViewById(R.id.chargingContent);
                 TextView elem5 = (TextView) v.findViewById(R.id.lockContent);
 

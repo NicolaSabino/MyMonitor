@@ -21,6 +21,7 @@ public class DataService extends IntentService  {
         private DbManager       db;
         private boolean         trigger;
         private MyLightSensor   myLightSensor;
+        private MyMotionSensor  myMotionSensor;
 
         //costruttore
         public DataService() {
@@ -39,9 +40,17 @@ public class DataService extends IntentService  {
             initSensori();//inizializzo il SensorManager e dei vari sensori
             while(trigger)
             {
+
                 myLightSensor.registerLightSensor();
-                this.salva(myLightSensor.getValue() + " lux");
-                pause(6000);//aspetto un minuto
+                myMotionSensor.registerMotionSensor();
+                pause(500);//mezzo secondo per permetere di registrare corretamente i sensori
+
+                this.salva(myLightSensor.getValue() + " lux", myMotionSensor.getValue() + "m/s^2");
+
+                myLightSensor.unregisterLightSensor();
+                myMotionSensor.unregisterMotionSensor();
+
+                pause(300000);//aspetto 5 minuti
             }
 
         }
@@ -54,6 +63,7 @@ public class DataService extends IntentService  {
         private void initSensori() {
             SensorManager mymanager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
             myLightSensor  = new MyLightSensor(mymanager);
+            myMotionSensor = new MyMotionSensor(mymanager);
         }
 
         @Override
@@ -74,10 +84,10 @@ public class DataService extends IntentService  {
             }
         }
 
-        public void salva(String light)
+        public void salva(String light,String movement)
         {
             //TODO sostituire le tre stringhe con dati veri!
-            db.save(light,Math.random(),Math.random(),true,true);
+            db.save(light,movement,0,false,false);
         }
 
 

@@ -9,23 +9,24 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by nicola on 21/11/16.
  */
 
-public class DataService extends IntentService implements SensorEventListener {
+public class DataService extends IntentService  {
 
         private DbManager       db;
         private boolean         trigger;
-        private SensorManager   mSensorManager;
-        private Sensor          mSensor;
+        private MyLightSensor   myLightSensor;
 
         //costruttore
         public DataService() {
             super("DataService");
             db = new DbManager(this);
             trigger = true;
-
         }
 
 
@@ -35,8 +36,7 @@ public class DataService extends IntentService implements SensorEventListener {
         @Override
         protected void onHandleIntent(Intent i) {
 
-            initManager();
-            lightSensor();
+            initSensori();//inizializzo il SensorManager e dei vari sensori
             while(trigger)
             {
                 this.salva();
@@ -45,42 +45,21 @@ public class DataService extends IntentService implements SensorEventListener {
 
         }
 
-    /*
-     * il SensorManager deve essere NECESSARIAMENTE inizializzado dopo l'handelIntent perchè prima non vi è alcun Context nel quale
-     * l'intent adopera, di conseguenza non sono disponibili i servizi dei sensori
-     */
-    private void initManager() {
-        mSensorManager =(SensorManager) this.getSystemService(SENSOR_SERVICE);
-    }
 
-    private void lightSensor() {
-
-
-        //istanzio il sensore della luminosità
-        if (mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null){
-            MessageHelper.log("sensore di luminosità","SENSORE INIZIALIZZATO CORRETTAMENTE");
+        /*
+         * Le classi che astraggono i sensori devono essere NECESSARIAMENTE inizializzate dopo l'handelIntent perchè prima non vi è alcun Context nel quale
+         * l'intent adopera, di conseguenza non sono disponibili i servizi dei sensori
+         */
+        private void initSensori() {
+            SensorManager mymanager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
+            myLightSensor  = new MyLightSensor(mymanager);
         }
-        else {
-            MessageHelper.log("sensore di luminosità","errore nell'inizializzazione");
-        }
-    }
 
-    @Override
+        @Override
         public void onDestroy() {
-            Log.i("Data_SERVICE", "Distruzione Service");
+            MessageHelper.log("Data_SERVICE", "Distruzione Service");
             trigger=false;
             super.onDestroy();
-        }
-
-
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int i) {
-
         }
 
 
@@ -99,7 +78,6 @@ public class DataService extends IntentService implements SensorEventListener {
             //TODO sostituire le tre stringhe con dati veri!
             db.save(Math.random(),Math.random(),Math.random(),true,true);
         }
-
 
 
 }

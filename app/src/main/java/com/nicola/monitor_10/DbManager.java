@@ -63,13 +63,14 @@ public class DbManager {
 
     }
 
-    //todo
+
     public Cursor query() {
         Cursor crs=null;
         try
         {
             SQLiteDatabase db=dbhelper.getReadableDatabase();
-            crs=db.query(DatabaseStrings.TBL_NAME, null, null, null, null, null, null, null);
+            String myQuery = "SELECT * FROM " + DatabaseStrings.TBL_NAME + " order by " + DatabaseStrings.FIELD_ID  + " DESC ";
+            crs=db.rawQuery(myQuery,null);
         }
         catch(SQLiteException sqle)
         {

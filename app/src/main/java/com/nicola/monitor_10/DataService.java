@@ -39,8 +39,9 @@ public class DataService extends IntentService  {
             initSensori();//inizializzo il SensorManager e dei vari sensori
             while(trigger)
             {
-                this.salva();
-                pause(1000);
+                myLightSensor.registerLightSensor();
+                this.salva(myLightSensor.getValue() + " lux");
+                pause(6000);//aspetto un minuto
             }
 
         }
@@ -73,10 +74,10 @@ public class DataService extends IntentService  {
             }
         }
 
-        public void salva()
+        public void salva(String light)
         {
             //TODO sostituire le tre stringhe con dati veri!
-            db.save(Math.random(),Math.random(),Math.random(),true,true);
+            db.save(light,Math.random(),Math.random(),true,true);
         }
 
 

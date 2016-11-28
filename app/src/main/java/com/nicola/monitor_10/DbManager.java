@@ -22,7 +22,7 @@ public class DbManager {
         dbhelper=new DBhelper(ctx);
     }
 
-    public void save(double lum, double mov, double s, boolean c, boolean l)
+    public void save(String lum, double mov, double s, boolean c, boolean l)
     {
         SQLiteDatabase db=dbhelper.getWritableDatabase();
 

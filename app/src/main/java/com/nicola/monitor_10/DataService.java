@@ -19,10 +19,11 @@ import java.util.List;
 
 public class DataService extends IntentService  {
 
-        private DbManager       db;
-        private boolean         trigger;
-        private MyLightSensor   myLightSensor;
-        private MyMotionSensor  myMotionSensor;
+        private DbManager           db;
+        private boolean             trigger;
+        private MyLightSensor       myLightSensor;
+        private MyMotionSensor      myMotionSensor;
+        private MyMicrophoneSensor  myMicrophoneSensor;
 
         //costruttore
         public DataService() {
@@ -42,18 +43,25 @@ public class DataService extends IntentService  {
             while(trigger)
             {
 
-                myLightSensor.registerLightSensor();
-                myMotionSensor.registerMotionSensor();
+                myLightSensor       .registerLightSensor();
+                myMotionSensor      .registerMotionSensor();
+                myMicrophoneSensor  .registerMicrophoneSensor();
+
                 pause(500);//mezzo secondo per permetere di registrare corretamente i sensori
 
-                this.salva(myLightSensor.getValue() + " lux", String.valueOf(myMotionSensor.getValue()));
+                this.salva(
+                        String.valueOf(myLightSensor.getValue()),
+                        String.valueOf(myMotionSensor.getValue()),
+                        String.valueOf(myMicrophoneSensor.getValue())
+                    );
 
                 //popolo la tabella mandando un messaggio di broadcast
                 Intent intent = new Intent("evento-popola-tabella");
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-                myLightSensor.unregisterLightSensor();
-                myMotionSensor.unregisterMotionSensor();
+                myLightSensor       .unregisterLightSensor();
+                myMotionSensor      .unregisterMotionSensor();
+                myMicrophoneSensor  .unregisterMicrophoneSensor();
 
                 pause(4000);//aspetto 4 sec
             }
@@ -67,8 +75,9 @@ public class DataService extends IntentService  {
          */
         private void initSensori() {
             SensorManager mymanager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
-            myLightSensor  = new MyLightSensor(mymanager);
-            myMotionSensor = new MyMotionSensor(mymanager);
+            myLightSensor       = new MyLightSensor(mymanager);
+            myMotionSensor      = new MyMotionSensor(mymanager);
+            myMicrophoneSensor  = new MyMicrophoneSensor(this);
         }
 
         @Override
@@ -89,10 +98,10 @@ public class DataService extends IntentService  {
             }
         }
 
-        public void salva(String light,String movement)
+        public void salva(String light,String movement,String sound)
         {
             //TODO sostituire le tre stringhe con dati veri!
-            db.save(light,movement,0,false,false);
+            db.save(light,movement,sound,false,false);
         }
 
 

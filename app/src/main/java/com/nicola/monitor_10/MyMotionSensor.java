@@ -69,8 +69,8 @@ public class MyMotionSensor {
             float y = event.values[1];
             float z = event.values[2];
 
-            float val = (float) Math.abs(Math.sqrt((double) (x*x + y*y + z*z)));
-            mAccel = val - 9.8f;
+            float val = (float) Math.sqrt((double) (x*x + y*y + z*z));
+            mAccel = (val - 9.8f)*100;
 
         }
 

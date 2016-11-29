@@ -1,12 +1,15 @@
 package com.nicola.monitor_10;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItemView;
@@ -59,13 +62,29 @@ public class MainActivity extends AppCompatActivity {
         popolaTabella();
         MessageHelper.log("ON_CREATE", "popolo la tabella");
 
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReciver,new IntentFilter("evento-popola-tabella"));
     }
+
+    private BroadcastReceiver mMessageReciver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //ogni volta che ricevo un intent popolo la tabella
+            popolaTabella();
+        }
+    };
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
         popolaTabella();
         MessageHelper.log("RESUME", "popolo la tabella");
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReciver);
+       super.onDestroy();
     }
 
     private void cambiastato(View view) {

@@ -68,12 +68,9 @@ public class MyMotionSensor {
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
-            mAccelLast = mAccelCurrent;
-            mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
-            mAccel= mAccelCurrent - 9.5f; //sottraggo la forza di gravità
-            /*float delta = mAccelCurrent - mAccelLast;
-            mAccel = mAccel * 0.9f + delta; //High-pass filter
-            */
+
+            float val = (float) Math.abs(Math.sqrt((double) (x*x + y*y + z*z)));
+            mAccel = val - 9.8f;
 
         }
 

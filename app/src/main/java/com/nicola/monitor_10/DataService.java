@@ -7,6 +7,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class DataService extends IntentService  {
          * Corpo principale dell'intent dove si orchestrano le acquisizioni e il delay
          */
         @Override
-        protected void onHandleIntent(Intent i) {
+         protected void onHandleIntent(Intent i) {
 
             initSensori();//inizializzo il SensorManager e dei vari sensori
             while(trigger)
@@ -45,12 +46,16 @@ public class DataService extends IntentService  {
                 myMotionSensor.registerMotionSensor();
                 pause(500);//mezzo secondo per permetere di registrare corretamente i sensori
 
-                this.salva(myLightSensor.getValue() + " lux", myMotionSensor.getValue() + "m/s^2");
+                this.salva(myLightSensor.getValue() + " lux", String.valueOf(myMotionSensor.getValue()));
+
+                //popolo la tabella mandando un messaggio di broadcast
+                Intent intent = new Intent("evento-popola-tabella");
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
                 myLightSensor.unregisterLightSensor();
                 myMotionSensor.unregisterMotionSensor();
 
-                pause(300000);//aspetto 5 minuti
+                pause(4000);//aspetto 4 sec
             }
 
         }

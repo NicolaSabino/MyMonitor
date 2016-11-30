@@ -1,17 +1,13 @@
 package com.nicola.monitor_10;
 
 import android.app.IntentService;
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
+import android.content.IntentFilter;
 import android.hardware.SensorManager;
-import android.net.Uri;
+import android.os.BatteryManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by nicola on 21/11/16.
@@ -23,7 +19,7 @@ public class DataService extends IntentService  {
         private boolean             trigger;
         private MyLightSensor       myLightSensor;
         private MyMotionSensor      myMotionSensor;
-        private MyMicrophoneSensor  myMicrophoneSensor;
+        private SoundMeter          soundMeter;
 
         //costruttore
         public DataService() {
@@ -39,20 +35,23 @@ public class DataService extends IntentService  {
         @Override
          protected void onHandleIntent(Intent i) {
 
+            int cont = 0;
+
             initSensori();//inizializzo il SensorManager e dei vari sensori
             while(trigger)
             {
-
+                MessageHelper.log("MainLoop DataService","Inizio acquisizione numero " + cont);
                 myLightSensor       .registerLightSensor();
                 myMotionSensor      .registerMotionSensor();
-                myMicrophoneSensor  .registerMicrophoneSensor();
-
+                soundMeter          .start();
                 pause(500);//mezzo secondo per permetere di registrare corretamente i sensori
 
                 this.salva(
                         String.valueOf(myLightSensor.getValue()),
                         String.valueOf(myMotionSensor.getValue()),
-                        String.valueOf(myMicrophoneSensor.getValue())
+                        String.valueOf(soundMeter.getAmplitude()),
+                        String.valueOf(isPhonePluggedIn()),
+                        String.valueOf(isPhoneLocked())
                     );
 
                 //popolo la tabella mandando un messaggio di broadcast
@@ -61,9 +60,11 @@ public class DataService extends IntentService  {
 
                 myLightSensor       .unregisterLightSensor();
                 myMotionSensor      .unregisterMotionSensor();
-                myMicrophoneSensor  .unregisterMicrophoneSensor();
+                soundMeter          .stop();
 
+                MessageHelper.log("MainLoop DataService","Fine Acquisizione");
                 pause(4000);//aspetto 4 sec
+                cont++;
             }
 
         }
@@ -77,7 +78,7 @@ public class DataService extends IntentService  {
             SensorManager mymanager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
             myLightSensor       = new MyLightSensor(mymanager);
             myMotionSensor      = new MyMotionSensor(mymanager);
-            myMicrophoneSensor  = new MyMicrophoneSensor(this);
+            soundMeter          = new SoundMeter();
         }
 
         @Override
@@ -98,12 +99,29 @@ public class DataService extends IntentService  {
             }
         }
 
-        public void salva(String light,String movement,String sound)
+        public void salva(String light,String movement,String sound,String charging,String locked)
         {
-            //TODO sostituire le tre stringhe con dati veri!
-            db.save(light,movement,sound,false,false);
+            db.save(light,movement,sound,charging,locked);
+        }
+
+        public boolean isPhonePluggedIn(){
+
+            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = registerReceiver(null, ifilter);
+            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    status == BatteryManager.BATTERY_STATUS_FULL;
+            return isCharging;
         }
 
 
+        public boolean isPhoneLocked(){
+            KeyguardManager myKM = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+            if( myKM.inKeyguardRestrictedInputMode()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 }
 

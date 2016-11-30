@@ -69,8 +69,11 @@ public class MyMotionSensor {
             float y = event.values[1];
             float z = event.values[2];
 
-            float val = (float) Math.sqrt((double) (x*x + y*y + z*z));
-            mAccel = (val - 9.8f)*100;
+            double magnitudo = Math.sqrt((x*x) + (y*y) + (z*z) ); //  m/s2
+            //float val = (float) magnitudo;
+            float val = 10f * (float) magnitudo; //conversion from m/s2 to dm/s2
+
+            mAccel = Math.abs(val - 98f); //sottraggo l'accelerazione di gravità 98 dm/s2
 
         }
 

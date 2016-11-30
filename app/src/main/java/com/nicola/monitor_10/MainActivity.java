@@ -1,14 +1,19 @@
 package com.nicola.monitor_10;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +26,9 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -132,8 +140,13 @@ public class MainActivity extends AppCompatActivity {
         }*/
 
         if (id == R.id.stato){
-            startStop();
-            return true;
+            if(checkPermission()){ //se ho i permessi per usare il microfono faccio partire il task in background
+                startStop();
+                return true;
+            }else{ //altrimenti
+                requestPermission();
+                return true;
+            }
         }
 
         if(id == R.id.refresh){
@@ -235,5 +248,36 @@ public class MainActivity extends AppCompatActivity {
         listaValori.setAdapter(adapter);
 
 
+    }
+
+
+    public boolean checkPermission(){
+
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(),
+                RECORD_AUDIO);
+        return result == PackageManager.PERMISSION_GRANTED ;
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(MainActivity.this, new
+                String[]{RECORD_AUDIO}, 1);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+
+                    boolean RecordPermission = grantResults[0] ==
+                            PackageManager.PERMISSION_GRANTED;
+
+                    if (RecordPermission) {
+                        MessageHelper.toast(this,"Permesso garantito!");
+                    } else {
+                        MessageHelper.toast(this,"Permesso negato");
+                    }
+
+                break;
+        }
     }
 }

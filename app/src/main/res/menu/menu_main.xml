@@ -6,21 +6,28 @@
 
 
 
-    <item
+    <!--<item
         android:id="@+id/refresh"
         android:icon="@drawable/refresh"
         android:title="refresh"
         app:showAsAction="ifRoom"
-        />
+        />-->
     <item
         android:id="@+id/stato"
         android:icon="@android:drawable/ic_media_play"
         android:title="play/stop"
         app:showAsAction="ifRoom"/>
 
-    <!--<item
+    <item
+        android:id="@+id/clearData"
+        android:icon="@android:drawable/ic_delete"
+        android:title="Delete Values"
+        app:showAsAction="never"
+        />
+
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />-->
+        app:showAsAction="never" />
 </menu>

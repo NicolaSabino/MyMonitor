@@ -135,9 +135,16 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        /*if (id == R.id.action_settings) {
+        if (id == R.id.action_settings) {
             return true;
-        }*/
+        }
+
+        if (id == R.id.clearData){
+            db.deleteTables();
+            popolaTabella();
+            MessageHelper.toast(this,"Informazioni eliminate correttamente");
+            return true;
+        }
 
         if (id == R.id.stato){
             if(checkPermission()){ //se ho i permessi per usare il microfono faccio partire il task in background
@@ -149,10 +156,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if(id == R.id.refresh){
+        /*if(id == R.id.refresh){
             popolaTabella();
             return true;
-        }
+        }*/
 
 
 
@@ -272,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
                             PackageManager.PERMISSION_GRANTED;
 
                     if (RecordPermission) {
+                        startStop();
                         MessageHelper.toast(this,"Permesso garantito!");
                     } else {
                         MessageHelper.toast(this,"Permesso negato");

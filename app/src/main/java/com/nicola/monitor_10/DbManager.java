@@ -46,18 +46,19 @@ public class DbManager {
 
     }
 
-    //todo
-    public boolean delete(long id)
+
+    public boolean deleteTables()
     {
         SQLiteDatabase db=dbhelper.getWritableDatabase();
         try
         {
-            if (db.delete(DatabaseStrings.TBL_NAME, DatabaseStrings.FIELD_ID+"=?", new String[]{Long.toString(id)})>0)
-                return true;
-            return false;
+            db.execSQL("delete from "+ DatabaseStrings.TBL_NAME);
+            db.execSQL("delete from "+ DatabaseStrings.TBL_NAME_2);
+            return true;
         }
         catch (SQLiteException sqle)
         {
+            sqle.printStackTrace();
             return false;
         }
 

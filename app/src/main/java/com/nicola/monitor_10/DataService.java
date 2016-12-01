@@ -63,7 +63,7 @@ public class DataService extends IntentService  {
                 soundMeter          .stop();
 
                 MessageHelper.log("MainLoop DataService","Fine Acquisizione");
-                pause(4000);//aspetto 4 sec
+                pause(600000);//aspetto 10 min
                 cont++;
             }
 

@@ -1,8 +1,13 @@
 package com.nicola.monitor_10;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -13,13 +18,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReciver,new IntentFilter("evento-popola-tabella"));
+
     }
 
     private BroadcastReceiver mMessageReciver = new BroadcastReceiver() {
@@ -86,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostResume() {
         super.onPostResume();
         popolaTabella();
+        deleteNotification();
         MessageHelper.log("RESUME", "popolo la tabella");
     }
 
@@ -94,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReciver);
        super.onDestroy();
     }
+
 
     private void cambiastato(View view) {
         //se stavo dormento
@@ -287,5 +298,70 @@ public class MainActivity extends AppCompatActivity {
 
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if(!playPauseState){
+            generateNotification(this.getApplicationContext(),
+                    "L'applicazione sta continuando ad acquisire dati in background!");
+            moveTaskToBack(true);
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if(!playPauseState){
+            generateNotification(this.getApplicationContext(),
+                    "L'applicazione sta continuando ad acquisire dati in background!");
+        }
+        super.onPause();
+    }
+
+   /* public void makeNotification(){
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Acquisiozione dati")
+                        .setContentText("L'applicazione sta continuando ad acquisire dati in background!");
+
+        // Sets an ID for the notification
+        int mNotificationId = 001;
+        // Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+    }*/
+
+    private static void generateNotification(Context context, String message){
+
+        int mNotificationId = 001;
+
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentIntent(intent)
+                .setPriority(5) //private static final PRIORITY_HIGH = 5;
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_VIBRATE);
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(001, mBuilder.build());
+    }
+
+
+    public void deleteNotification() {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(001);
     }
 }

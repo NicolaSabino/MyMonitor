@@ -46,16 +46,22 @@ public class DataService extends IntentService  {
                 soundMeter          .start();
                 pause(500);//mezzo secondo per permetere di registrare corretamente i sensori
 
-                this.salva(
-                        String.valueOf(myLightSensor.getValue()),
-                        String.valueOf(myMotionSensor.getValue()),
-                        String.valueOf(soundMeter.getAmplitude()),
-                        String.valueOf(isPhonePluggedIn()),
-                        String.valueOf(isPhoneLocked())
-                    );
+
+                String light    = String.valueOf(myLightSensor.getValue());
+                String motion   = String.valueOf(myMotionSensor.getValue());
+                String sound    = String.valueOf(soundMeter.getAmplitude());
+                String plugged  = String.valueOf(isPhonePluggedIn());
+                String locked   = String.valueOf(isPhoneLocked());
+
+
+                this.salva(light, motion, sound, plugged, locked);
 
                 //popolo la tabella mandando un messaggio di broadcast
                 Intent intent = new Intent("evento-popola-tabella");
+                intent.putExtra("light",light);
+                intent.putExtra("motion",motion);
+                intent.putExtra("sound",sound);
+
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
                 myLightSensor       .unregisterLightSensor();
@@ -63,7 +69,7 @@ public class DataService extends IntentService  {
                 soundMeter          .stop();
 
                 MessageHelper.log("MainLoop DataService","Fine Acquisizione");
-                pause(600000);//aspetto 10 min
+                pause(5000);//aspetto 10 sec
                 cont++;
             }
 

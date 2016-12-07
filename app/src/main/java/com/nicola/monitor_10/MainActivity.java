@@ -28,6 +28,13 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
+
 import static android.Manifest.permission.RECORD_AUDIO;
 
 /**
@@ -42,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     private Intent servizio;
     private MenuView.ItemView s;
     private DbManager db;
+    private LineGraphSeries<DataPoint> light,sound,movement;
+    private GraphView graph1,graph2,graph3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +84,22 @@ public class MainActivity extends AppCompatActivity {
         db = new DbManager(getApplicationContext());
 
         popolaTabella();
-        MessageHelper.log("ON_CREATE", "popolo la tabella");
 
+        light = new LineGraphSeries<DataPoint>();
+        sound = new LineGraphSeries<DataPoint>();
+        movement = new LineGraphSeries<DataPoint>();
+
+        graph1 = (GraphView) findViewById(R.id.graph1);
+        graph2 = (GraphView) findViewById(R.id.graph2);
+        graph3 = (GraphView) findViewById(R.id.graph3);
+
+        light.setColor(Color.GREEN);
+        sound.setColor(Color.RED);
+        movement.setColor(Color.BLUE);
+
+        initGrafici();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReciver,new IntentFilter("evento-popola-tabella"));
-
     }
 
     private BroadcastReceiver mMessageReciver = new BroadcastReceiver() {
@@ -86,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             //ogni volta che ricevo un intent popolo la tabella
             popolaTabella();
+            appendValuesTabella();
         }
     };
 
@@ -231,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                 String date         = crs.getString(crs.getColumnIndex(DatabaseStrings.FIELD_DATE));
 
                 //stampo le informazioni nella riga della tabella
-                /*TextView elem0 = (TextView) v.findViewById(R.id.idContent);*/
+                //TextView elem0 = (TextView) v.findViewById(R.id.idContent);
                 TextView elem1 = (TextView) v.findViewById(R.id.lightContent);
                 TextView elem2 = (TextView) v.findViewById(R.id.movContent);
                 TextView elem3 = (TextView) v.findViewById(R.id.soundContent);
@@ -240,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView elem6 = (TextView) v.findViewById(R.id.dateContent);
                 TextView elem7 = (TextView) v.findViewById(R.id.timeContent);
 
-                /*elem0.setText(id);*/
+                //elem0.setText(id);
                 elem1.setText(light);
                 elem2.setText(sound);
                 elem3.setText(movement);
@@ -257,7 +279,86 @@ public class MainActivity extends AppCompatActivity {
         ListView listaValori = (ListView) findViewById(R.id.listaValori);
         listaValori.setAdapter(adapter);
 
+    }
 
+    public void initGrafici(){
+
+        final Cursor crs = db.reverseQuery();
+
+        if (crs == null) {
+            // do nothing
+        } else {
+            if(crs.moveToFirst()){
+                for (int i=0;i<crs.getCount();i++) {
+
+                    String id = crs.getString(0);
+                    light.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(1)),true,30);
+                    sound.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(2)),true,30);
+                    movement.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(3)),true,30);
+                    crs.moveToNext();
+                }
+            }
+        }
+
+        light.setTitle("light");
+        light.setColor(Color.rgb(255,153,0));
+        light.setDrawBackground(true);
+        light.setBackgroundColor(Color.argb(60,255,153,0));
+        light.setDrawDataPoints(true);
+        light.setDataPointsRadius(8);
+        light.setThickness(5);
+
+        movement.setTitle("movement");
+        movement.setColor(Color.RED);
+        movement.setDrawBackground(true);
+        movement.setBackgroundColor(Color.argb(60,255,0,0));
+        movement.setDrawDataPoints(true);
+        movement.setDataPointsRadius(8);
+        movement.setThickness(5);
+
+        sound.setTitle("sound");
+        sound.setColor(Color.BLUE);
+        sound.setDrawBackground(true);
+        sound.setBackgroundColor(Color.argb(60,0,0,255));
+        sound.setDrawDataPoints(true);
+        sound.setDataPointsRadius(8);
+        sound.setThickness(5);
+
+        graph1.addSeries(light);
+        graph2.addSeries(sound);
+        graph3.addSeries(movement);
+
+        graph1.setTitle("light");
+        graph2.setTitle("sound");
+        graph3.setTitle("movement");
+
+        graph1.getViewport().setScrollable(true);
+        graph2.getViewport().setScrollable(true);
+        graph3.getViewport().setScrollable(true);
+    }
+
+    public void appendValuesTabella(){
+        final Cursor crs = db.lastValue();
+
+        if (crs == null) {
+            // do nothing
+        } else {
+            if(crs.moveToFirst()){
+                for (int i=0;i<crs.getCount();i++) {
+
+                    String id = crs.getString(0);
+                    light.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(1)),true,30);
+                    sound.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(2)),true,30);
+                    movement.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(3)),true,30);
+                    crs.moveToNext();
+                }
+            }
+        }
+
+        graph1.addSeries(light);
+        graph2.addSeries(sound);
+        graph3.addSeries(movement);
+        
     }
 
 

@@ -83,16 +83,40 @@ public class DbManager {
     }
 
 
-    public Cursor query() {
+    public Cursor query(){
         Cursor crs = null;
         try {
             SQLiteDatabase db = dbhelper.getReadableDatabase();
             String myQuery = "SELECT * FROM " + DatabaseStrings.TBL_NAME + " order by " + DatabaseStrings.FIELD_ID + " DESC ";
             crs = db.rawQuery(myQuery, null);
         } catch (SQLiteException sqle) {
-            return null;
+            sqle.printStackTrace();
         }
         return crs;
+    }
+
+    public Cursor reverseQuery(){
+        Cursor crs = null;
+        try {
+            SQLiteDatabase db = dbhelper.getReadableDatabase();
+            String myQuery = "SELECT * FROM " + DatabaseStrings.TBL_NAME + " order by " + DatabaseStrings.FIELD_ID;
+            crs = db.rawQuery(myQuery, null);
+        } catch (SQLiteException sqle) {
+            sqle.printStackTrace();
+        }
+        return crs;
+    }
+
+    public Cursor lastValue(){
+        Cursor c = null;
+        try {
+            SQLiteDatabase db = dbhelper.getReadableDatabase();
+            String myQuery = "SELECT * FROM " + DatabaseStrings.TBL_NAME + " order by " + DatabaseStrings.FIELD_ID + " DESC limit 1";
+            c = db.rawQuery(myQuery, null);
+        } catch (SQLiteException sqle){
+            sqle.printStackTrace();
+        }
+        return c;
     }
 
     /*public void changeState(boolean state) {

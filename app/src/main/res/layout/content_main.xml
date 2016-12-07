@@ -12,104 +12,46 @@
     tools:context="com.nicola.monitor_10.MainActivity"
     tools:showIn="@layout/activity_main">
 
-
-    <TableLayout
-        android:id="@+id/tabellaValori"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stretchColumns="1"
-        >
-        <TableRow>
+        android:layout_height="match_parent">
 
-            <TextView
-                android:text="Id"
-                android:layout_column="1"
-                android:padding="3dip"
-                android:id="@+id/idlabel"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="#757575"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        <com.jjoe64.graphview.GraphView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:id="@+id/graph1"
+            android:layout_column="0"
+            android:layout_span="2"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:padding="5dp"/>
 
+        <com.jjoe64.graphview.GraphView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:id="@+id/graph2"
+            android:layout_span="2"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:padding="5dp"/>
 
-            <TextView
-                android:text="Light"
-                android:layout_column="2"
-                android:padding="3dip"
-                android:id="@+id/lightlabel"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="#757575"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        <com.jjoe64.graphview.GraphView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:id="@+id/graph3"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:padding="5dp"/>
 
-            <TextView
-                android:text="Movement"
-                android:layout_column="3"
-                android:padding="3dip"
-                android:id="@+id/movlabel"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="#757575"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-
-            <TextView
-                android:text="Sound"
-                android:layout_column="4"
-                android:padding="3dip"
-                android:id="@+id/soundlabel"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="#757575"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="Charging"
-                android:layout_column="5"
-                android:padding="3dip"
-                android:id="@+id/charginglabel"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="#757575"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="Locked"
-                android:layout_column="6"
-                android:padding="3dip"
-                android:id="@+id/locklabel"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="#757575"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-
-        </TableRow>
-
-        <TableRow>
-            <View
-                android:layout_column="1"
-                android:layout_span="6"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#757575"
-                />
-        </TableRow>
-        <TableRow>
-            <ListView
-                android:layout_span="7"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/listaValori" />
-        </TableRow>
-
-    </TableLayout>
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/listaValori"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:padding="5dp"/>
+    </LinearLayout>
 
 
 </RelativeLayout>

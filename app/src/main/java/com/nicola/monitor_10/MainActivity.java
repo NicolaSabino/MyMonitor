@@ -1,13 +1,10 @@
 package com.nicola.monitor_10;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -15,30 +12,29 @@ import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import static android.Manifest.permission.RECORD_AUDIO;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
+/**
+ * Main activity dell'applicazione
+ */
 public class MainActivity extends AppCompatActivity {
+
 
     private boolean stato;
     private FloatingActionButton fab;
@@ -49,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -109,38 +107,34 @@ public class MainActivity extends AppCompatActivity {
     private void cambiastato(View view) {
         //se stavo dormento
         if(stato){
-
             MessageHelper.snak(view,"Buongiorno");
-
             fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,153,0)));//arancione
             fab.setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
 
-
         }else{
-
             MessageHelper.snak(view,"Buonanotte");
-
             fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(63,81,181)));//blu
             fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
-
         }
 
         MessageHelper.log("SWITCH_STATE", stato + " -> " + !stato);
-
-        //cambio lo stato dell'utente
-        stato = !stato;
-
-        //db.changeState(stato);
+        stato = !stato; //cambio lo stato dell'utente
+        /*db.changeState(stato); */ //salvo il nuovo stato nel database
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         this.s = (MenuView.ItemView) findViewById(R.id.stato);
         return true;
     }
 
+
+    /**
+     * Metodo che cattura la selezione degli elementi sulla ActionBar da parte dell'utente
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -166,13 +160,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         }
-
-        /*if(id == R.id.refresh){
-            popolaTabella();
-            return true;
-        }*/
-
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -226,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
         CursorAdapter adapter = new CursorAdapter(this, crs, 0) {
             @Override
             public View newView(Context context, Cursor cursor, ViewGroup parent) {
-                View v = getLayoutInflater().inflate(R.layout.row_table,null);
+                View v = getLayoutInflater().inflate(R.layout.custom_row_table,null);
                 return v;
             }
 
@@ -241,21 +228,26 @@ public class MainActivity extends AppCompatActivity {
                 String charging     = crs.getString(crs.getColumnIndex(DatabaseStrings.FIELD_CHARGING));
                 String locked       = crs.getString(crs.getColumnIndex(DatabaseStrings.FIELD_LOCKED));
                 String time         = crs.getString(crs.getColumnIndex(DatabaseStrings.FIELD_TIME));
+                String date         = crs.getString(crs.getColumnIndex(DatabaseStrings.FIELD_DATE));
 
                 //stampo le informazioni nella riga della tabella
-                TextView elem0 = (TextView) v.findViewById(R.id.idContent);
+                /*TextView elem0 = (TextView) v.findViewById(R.id.idContent);*/
                 TextView elem1 = (TextView) v.findViewById(R.id.lightContent);
                 TextView elem2 = (TextView) v.findViewById(R.id.movContent);
                 TextView elem3 = (TextView) v.findViewById(R.id.soundContent);
                 TextView elem4 = (TextView) v.findViewById(R.id.chargingContent);
                 TextView elem5 = (TextView) v.findViewById(R.id.lockContent);
+                TextView elem6 = (TextView) v.findViewById(R.id.dateContent);
+                TextView elem7 = (TextView) v.findViewById(R.id.timeContent);
 
-                elem0.setText(id);
+                /*elem0.setText(id);*/
                 elem1.setText(light);
                 elem2.setText(sound);
                 elem3.setText(movement);
                 elem4.setText(charging);
                 elem5.setText(locked);
+                elem6.setText(date);
+                elem7.setText(time);
 
 
             }
@@ -321,23 +313,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-   /* public void makeNotification(){
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("Acquisiozione dati")
-                        .setContentText("L'applicazione sta continuando ad acquisire dati in background!");
-
-        // Sets an ID for the notification
-        int mNotificationId = 001;
-        // Gets an instance of the NotificationManager service
-        NotificationManager mNotifyMgr =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
-    }*/
 
     private static void generateNotification(Context context, String message){
 
@@ -348,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentIntent(intent)
                 .setPriority(5) //private static final PRIORITY_HIGH = 5;

@@ -31,19 +31,22 @@ public class DBhelper extends SQLiteOpenHelper {
                 DatabaseStrings.FIELD_MOVEMENT  + " DOUBLE,"    +
                 DatabaseStrings.FIELD_LOCKED    + " BOOLEAN,"   +
                 DatabaseStrings.FIELD_CHARGING  + " BOOLEAN,"   +
+                DatabaseStrings.FIELD_DATE      + " VARCHAR,"   +
                 DatabaseStrings.FIELD_TIME      + " VARCHAR )"
                 ;
         db.execSQL(q);
 
         Log.i("DBHELPER","Creazione del db con la tabella " + DatabaseStrings.TBL_NAME );
 
-        String q2="CREATE TABLE "+
+        /*String q2="CREATE TABLE "+
                 DatabaseStrings.TBL_NAME_2      + " ( " +
                 DatabaseStrings.FIELD_ID        + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 DatabaseStrings.FIELD_STATE     + " BOOLEAN,"   +
+                DatabaseStrings.FIELD_DATE      + " VARCHAR,"   +
                 DatabaseStrings.FIELD_TIME      + " VARCHAR )"
                 ;
         db.execSQL(q2);
+        */
 
         Log.i("DBHELPER","Creazione del db con la tabella " + DatabaseStrings.TBL_NAME_2 );
     }

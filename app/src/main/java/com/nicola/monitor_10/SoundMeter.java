@@ -18,6 +18,7 @@ public class SoundMeter {
     public void stop() {
         if (ar != null) {
             ar.stop();
+            ar.release();
         }
     }
 

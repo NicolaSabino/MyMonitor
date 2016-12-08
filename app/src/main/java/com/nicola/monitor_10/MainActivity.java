@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private DbManager db;
     private LineGraphSeries<DataPoint> light,sound,movement;
     private GraphView graph1,graph2,graph3;
+    private int currentGraphIndex;
 
 
     @Override
@@ -98,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         movement.setColor(Color.BLUE);
 
         initGrafici();
+        currentGraphIndex = 0;
+        popolaGrafici();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReciver,new IntentFilter("evento-popola-tabella"));
     }
@@ -107,7 +110,10 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             //ogni volta che ricevo un intent popolo la tabella
             popolaTabella();
-            appendValuesTabella();
+            float l = Float.parseFloat(intent.getStringExtra("light"));
+            float s = Float.parseFloat(intent.getStringExtra("sound"));
+            float m = Float.parseFloat(intent.getStringExtra("motion"));
+            appendValuesTabella(l,s,m);
         }
     };
 
@@ -253,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
                 String date         = crs.getString(crs.getColumnIndex(DatabaseStrings.FIELD_DATE));
 
                 //stampo le informazioni nella riga della tabella
-                //TextView elem0 = (TextView) v.findViewById(R.id.idContent);
+                TextView elem0 = (TextView) v.findViewById(R.id.idContent);
                 TextView elem1 = (TextView) v.findViewById(R.id.lightContent);
                 TextView elem2 = (TextView) v.findViewById(R.id.movContent);
                 TextView elem3 = (TextView) v.findViewById(R.id.soundContent);
@@ -262,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView elem6 = (TextView) v.findViewById(R.id.dateContent);
                 TextView elem7 = (TextView) v.findViewById(R.id.timeContent);
 
-                //elem0.setText(id);
+                elem0.setText(id);
                 elem1.setText(light);
                 elem2.setText(sound);
                 elem3.setText(movement);
@@ -283,22 +289,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void initGrafici(){
 
-        final Cursor crs = db.reverseQuery();
-
-        if (crs == null) {
-            // do nothing
-        } else {
-            if(crs.moveToFirst()){
-                for (int i=0;i<crs.getCount();i++) {
-
-                    String id = crs.getString(0);
-                    light.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(1)),true,30);
-                    sound.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(2)),true,30);
-                    movement.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(3)),true,30);
-                    crs.moveToNext();
-                }
-            }
-        }
+        //  definisco lo stile dei grafici
 
         light.setTitle("light");
         light.setColor(Color.rgb(255,153,0));
@@ -307,6 +298,7 @@ public class MainActivity extends AppCompatActivity {
         light.setDrawDataPoints(true);
         light.setDataPointsRadius(8);
         light.setThickness(5);
+        light.setAnimated(true);
 
         movement.setTitle("movement");
         movement.setColor(Color.RED);
@@ -315,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
         movement.setDrawDataPoints(true);
         movement.setDataPointsRadius(8);
         movement.setThickness(5);
+        movement.setAnimated(true);
 
         sound.setTitle("sound");
         sound.setColor(Color.BLUE);
@@ -323,42 +316,73 @@ public class MainActivity extends AppCompatActivity {
         sound.setDrawDataPoints(true);
         sound.setDataPointsRadius(8);
         sound.setThickness(5);
+        sound.setAnimated(true);
+
+        graph1.getViewport().setXAxisBoundsManual(true);
+        graph1.getViewport().setMinX(1);
+        graph1.getViewport().setMaxX(20);
+        graph1.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+        graph1.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        graph1.setTitleColor(Color.rgb(255,153,0));
+
+        graph2.getViewport().setXAxisBoundsManual(true);
+        graph2.getViewport().setMinX(1);
+        graph2.getViewport().setMaxX(20);
+        graph2.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+        graph2.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        graph2.setTitleColor(Color.BLUE);
+
+        graph3.getViewport().setXAxisBoundsManual(true);
+        graph3.getViewport().setMinX(1);
+        graph3.getViewport().setMaxX(20);
+        graph3.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+        graph3.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        graph3.setTitleColor(Color.RED);
+
+        graph1.setTitle("Light");
+        graph2.setTitle("Sound");
+        graph3.setTitle("Movement");
+
+        /*graph1.getViewport().setScrollable(true);
+        graph2.getViewport().setScrollable(true);
+        graph3.getViewport().setScrollable(true);
+        */
+
+
+
+
 
         graph1.addSeries(light);
         graph2.addSeries(sound);
         graph3.addSeries(movement);
-
-        graph1.setTitle("light");
-        graph2.setTitle("sound");
-        graph3.setTitle("movement");
-
-        graph1.getViewport().setScrollable(true);
-        graph2.getViewport().setScrollable(true);
-        graph3.getViewport().setScrollable(true);
     }
 
-    public void appendValuesTabella(){
-        final Cursor crs = db.lastValue();
+    public void popolaGrafici(){
+
+        final Cursor crs = db.reverseQuery();
 
         if (crs == null) {
             // do nothing
         } else {
             if(crs.moveToFirst()){
                 for (int i=0;i<crs.getCount();i++) {
-
                     String id = crs.getString(0);
                     light.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(1)),true,30);
                     sound.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(2)),true,30);
                     movement.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(3)),true,30);
                     crs.moveToNext();
+                    currentGraphIndex=Integer.valueOf(id);
                 }
             }
         }
+    }
 
-        graph1.addSeries(light);
-        graph2.addSeries(sound);
-        graph3.addSeries(movement);
-        
+    public void appendValuesTabella(float l,float s,float m){
+        currentGraphIndex++;
+        light.appendData(new DataPoint(currentGraphIndex,l),true,30);
+        sound.appendData(new DataPoint(currentGraphIndex,s),true,30);
+        movement.appendData(new DataPoint(currentGraphIndex,m),true,30);
+
     }
 
 

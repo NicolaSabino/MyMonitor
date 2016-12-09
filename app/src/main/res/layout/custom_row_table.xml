@@ -49,7 +49,7 @@
             android:id="@+id/lightContent"
             android:textSize="12sp"
             android:fontFamily="sans-serif-medium"
-            android:textColor="#FF9900"
+            android:textColor="#FFC107"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -60,7 +60,7 @@
             android:id="@+id/soundContent"
             android:textSize="12sp"
             android:fontFamily="sans-serif-medium"
-            android:textColor="#0000FF"
+            android:textColor="#3F51B5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -71,7 +71,7 @@
             android:id="@+id/movContent"
             android:textSize="12sp"
             android:fontFamily="sans-serif-medium"
-            android:textColor="#FF0000"
+            android:textColor="#E64A19"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 

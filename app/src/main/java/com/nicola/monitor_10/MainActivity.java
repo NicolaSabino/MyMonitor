@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         fab     = (FloatingActionButton) findViewById(R.id.fab);
         stato   = false;
-        fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,153,0)));//ARANCIONE
+        fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//ARANCIONE
         fab     .setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
         fab     .setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,9 +94,7 @@ public class MainActivity extends AppCompatActivity {
         graph2 = (GraphView) findViewById(R.id.graph2);
         graph3 = (GraphView) findViewById(R.id.graph3);
 
-        light.setColor(Color.GREEN);
-        sound.setColor(Color.RED);
-        movement.setColor(Color.BLUE);
+
 
         initGrafici();
         currentGraphIndex = 0;
@@ -136,12 +134,12 @@ public class MainActivity extends AppCompatActivity {
         //se stavo dormento
         if(stato){
             MessageHelper.snak(view,"Buongiorno");
-            fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,153,0)));//arancione
+            fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//arancione
             fab.setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
 
         }else{
             MessageHelper.snak(view,"Buonanotte");
-            fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(63,81,181)));//blu
+            fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(48,63,159)));//blu
             fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
         }
 
@@ -292,27 +290,27 @@ public class MainActivity extends AppCompatActivity {
         //  definisco lo stile dei grafici
 
         light.setTitle("light");
-        light.setColor(Color.rgb(255,153,0));
+        light.setColor(Color.rgb(255,193,7));//ambra
         light.setDrawBackground(true);
-        light.setBackgroundColor(Color.argb(60,255,153,0));
+        light.setBackgroundColor(Color.argb(60,255,193,7));
         light.setDrawDataPoints(true);
         light.setDataPointsRadius(8);
         light.setThickness(5);
         light.setAnimated(true);
 
         movement.setTitle("movement");
-        movement.setColor(Color.RED);
+        movement.setColor(Color.rgb(230,74,25));//rosso
         movement.setDrawBackground(true);
-        movement.setBackgroundColor(Color.argb(60,255,0,0));
+        movement.setBackgroundColor(Color.argb(60,230,74,25));
         movement.setDrawDataPoints(true);
         movement.setDataPointsRadius(8);
         movement.setThickness(5);
         movement.setAnimated(true);
 
         sound.setTitle("sound");
-        sound.setColor(Color.BLUE);
+        sound.setColor(Color.rgb(63,81,181));//blu
         sound.setDrawBackground(true);
-        sound.setBackgroundColor(Color.argb(60,0,0,255));
+        sound.setBackgroundColor(Color.argb(60,63,81,181));
         sound.setDrawDataPoints(true);
         sound.setDataPointsRadius(8);
         sound.setThickness(5);
@@ -323,30 +321,30 @@ public class MainActivity extends AppCompatActivity {
         graph1.getViewport().setMaxX(20);
         graph1.getGridLabelRenderer().setHorizontalLabelsVisible(false);
         graph1.getGridLabelRenderer().setVerticalLabelsVisible(false);
-        graph1.setTitleColor(Color.rgb(255,153,0));
+        graph1.setTitleColor(Color.rgb(255,193,7));
 
         graph2.getViewport().setXAxisBoundsManual(true);
         graph2.getViewport().setMinX(1);
         graph2.getViewport().setMaxX(20);
         graph2.getGridLabelRenderer().setHorizontalLabelsVisible(false);
         graph2.getGridLabelRenderer().setVerticalLabelsVisible(false);
-        graph2.setTitleColor(Color.BLUE);
+        graph2.setTitleColor(Color.rgb(48,63,159));
 
         graph3.getViewport().setXAxisBoundsManual(true);
         graph3.getViewport().setMinX(1);
         graph3.getViewport().setMaxX(20);
         graph3.getGridLabelRenderer().setHorizontalLabelsVisible(false);
         graph3.getGridLabelRenderer().setVerticalLabelsVisible(false);
-        graph3.setTitleColor(Color.RED);
+        graph3.setTitleColor(Color.rgb(230,74,25));
 
         graph1.setTitle("Light");
         graph2.setTitle("Sound");
         graph3.setTitle("Movement");
 
-        /*graph1.getViewport().setScrollable(true);
+        graph1.getViewport().setScrollable(true);
         graph2.getViewport().setScrollable(true);
         graph3.getViewport().setScrollable(true);
-        */
+
 
 
 
@@ -422,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(!playPauseState){
             generateNotification(this.getApplicationContext(),
-                    "L'applicazione sta continuando ad acquisire dati in background!");
+                    "L'applicazione acquisirà dati in background!");
             moveTaskToBack(true);
         }else{
             super.onBackPressed();

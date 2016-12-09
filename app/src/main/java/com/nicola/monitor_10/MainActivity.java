@@ -1,5 +1,6 @@
 package com.nicola.monitor_10;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
@@ -63,11 +65,24 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        stato = sharedPref.getBoolean("sato",true);
+        playPauseState = sharedPref.getBoolean("playPauseState",true);
 
         fab     = (FloatingActionButton) findViewById(R.id.fab);
-        stato   = false;
-        fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//ARANCIONE
-        fab     .setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
+
+
+        if(stato){
+            fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//ARANCIONE
+            fab     .setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
+        }else{
+            fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(48,63,159)));//blu
+            fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
+        }
+
+
+
+
         fab     .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,8 +90,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //settaggio dello stato del bottone playPause
-        playPauseState = true; //il bottone è posizionato su play
+
 
         //settaggio dell'intent che gestisce l'acquisizione dati
         this.servizio = new Intent(this,DataService.class);
@@ -101,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
         popolaGrafici();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReciver,new IntentFilter("evento-popola-tabella"));
+
+
     }
 
     private BroadcastReceiver mMessageReciver = new BroadcastReceiver() {
@@ -124,12 +140,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReciver);
-       super.onDestroy();
+    protected void onSaveInstanceState(Bundle outState) {
+
+        super.onSaveInstanceState(outState);
+
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("state",stato);
+        editor.putBoolean("playPauseState",this.playPauseState);
+        editor.apply();
+
+
+
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        MessageHelper.log("saveistance","DATI RECUPERATI");
 
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReciver);
+        super.onDestroy();
+    }
+
+    /**
+     * Passo da Buongiorno a buonanotte e viceversa
+     * @param view
+     */
     private void cambiastato(View view) {
         //se stavo dormento
         if(stato){
@@ -150,8 +192,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        this.s = (MenuView.ItemView) findViewById(R.id.stato);
+
+        if(playPauseState){
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        }else{
+            getMenuInflater().inflate(R.menu.menu_main_pause, menu);
+            MessageHelper.toast(getApplicationContext(),"Acquisizione dati già in esecuzione");
+        }
+
+        this.s = (MenuView.ItemView) findViewById(R.id.alarmState);
+
         return true;
     }
 
@@ -177,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        if (id == R.id.stato){
+        if (id == R.id.alarmState){
             if(checkPermission()){ //se ho i permessi per usare il microfono faccio partire il task in background
                 startStop();
                 return true;
@@ -195,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void startStop(){
 
-        ActionMenuItemView x = (ActionMenuItemView) findViewById(R.id.stato);
+        ActionMenuItemView x = (ActionMenuItemView) findViewById(R.id.alarmState);
 
         if(playPauseState){
 
@@ -206,7 +256,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            this.startService(servizio);
+            //this.startService(servizio);
+            scheduleAlarm();
 
             //messaggi
             MessageHelper.log("TOOLBAR","Play -> inizio acquisizione dati");
@@ -221,7 +272,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            this.stopService(servizio);
+            //this.stopService(servizio);
+            cancelAlarm();
 
             //messaggi
             MessageHelper.log("TOOLBAR","Pause -> acquisizione dati sospesa");
@@ -438,6 +490,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
     private static void generateNotification(Context context, String message){
 
         int mNotificationId = 001;
@@ -463,4 +517,29 @@ public class MainActivity extends AppCompatActivity {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(001);
     }
+
+    // Setup a recurring alarm every half hour
+    public void scheduleAlarm() {
+        // Costruisco un intent che eseguirà l'AlarmReceiver
+        Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+        // Creo un  PendingIntent che verrà attivato quando l'allarme si spegne
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Configuro un allarme periodico ogni 5 secondi
+        long firstMillis = System.currentTimeMillis(); // alarm is set right away
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
+        // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,firstMillis,
+                1000 * 120 , pIntent);
+    }
+
+    public void cancelAlarm() {
+        Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarm.cancel(pIntent);
+    }
+
 }

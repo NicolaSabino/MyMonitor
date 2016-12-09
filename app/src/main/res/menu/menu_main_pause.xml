@@ -14,7 +14,7 @@
         />-->
     <item
         android:id="@+id/alarmState"
-        android:icon="@android:drawable/ic_media_play"
+        android:icon="@android:drawable/ic_media_pause"
         android:title="play/stop"
         app:showAsAction="ifRoom"/>
 

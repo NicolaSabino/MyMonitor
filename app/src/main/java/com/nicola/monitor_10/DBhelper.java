@@ -47,8 +47,6 @@ public class DBhelper extends SQLiteOpenHelper {
                 ;
         db.execSQL(q2);
         */
-
-        Log.i("DBHELPER","Creazione del db con la tabella " + DatabaseStrings.TBL_NAME_2 );
     }
 
     @Override

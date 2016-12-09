@@ -21,9 +21,15 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".MyAlarmReceiver"
+            android:process=":remote" >
+        </receiver>
+
         <service
             android:name=".DataService"
-            android:exported="false"/>
+            android:exported="false">
+        </service>
 
     </application>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />

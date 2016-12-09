@@ -44,22 +44,6 @@ public class DbManager {
 
 
         try {
-
-            /*db.execSQL("insert into " + DatabaseStrings.TBL_NAME + "( " +
-                    DatabaseStrings.FIELD_LIGHT + " , " +
-                    DatabaseStrings.FIELD_SOUND+ " , " +
-                    DatabaseStrings.FIELD_MOVEMENT + " , " +
-                    DatabaseStrings.FIELD_LOCKED + " , " +
-                    DatabaseStrings.FIELD_CHARGING + " , " +
-                    DatabaseStrings.FIELD_DATE + " , " +
-                    DatabaseStrings.FIELD_TIME + " ) values( "
-                    + lum  + " , "
-                    + s  + " , "
-                    + mov    + " , "
-                    + l    + " , "
-                    + c    + " , "
-                    + " CURDATE() "
-                    + ", CURTIME() )");*/
             db.insert(DatabaseStrings.TBL_NAME, null, cv);
             Log.i("DBMANAGER", "Nuovo salvataggio avvenuto con successo");
         } catch (SQLiteException sqle) {
@@ -67,6 +51,7 @@ public class DbManager {
         }
 
     }
+
 
 
     public boolean deleteTables() {
@@ -107,17 +92,6 @@ public class DbManager {
         return crs;
     }
 
-    public Cursor lastValue(){
-        Cursor c = null;
-        try {
-            SQLiteDatabase db = dbhelper.getReadableDatabase();
-            String myQuery = "SELECT * FROM " + DatabaseStrings.TBL_NAME + " order by " + DatabaseStrings.FIELD_ID + " DESC limit 1";
-            c = db.rawQuery(myQuery, null);
-        } catch (SQLiteException sqle){
-            sqle.printStackTrace();
-        }
-        return c;
-    }
 
     /*public void changeState(boolean state) {
 
@@ -217,7 +191,7 @@ public class DbManager {
 
         Calendar c = Calendar.getInstance();
         System.out.println("Current time => "+c.getTime());
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
         String formattedTime = df.format(c.getTime());
         return formattedTime;
     }

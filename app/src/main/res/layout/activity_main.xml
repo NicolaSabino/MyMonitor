@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clearTaskOnLaunch="false"
     android:fitsSystemWindows="true"
-    tools:context="com.nicola.monitor_10.MainActivity">
+    tools:context="com.nicola.monitor_10.MainActivity"
+    android:id="@+id/activity_main" >
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

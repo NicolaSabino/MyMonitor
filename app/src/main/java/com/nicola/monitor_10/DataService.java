@@ -25,7 +25,7 @@ public class DataService extends IntentService  {
         public DataService() {
             super("DataService");
             db = new DbManager(this);
-            trigger = true;
+
         }
 
 
@@ -35,43 +35,45 @@ public class DataService extends IntentService  {
         @Override
          protected void onHandleIntent(Intent i) {
 
-            int cont = 0;
+
 
             initSensori();//inizializzo il SensorManager e dei vari sensori
-            while(trigger)
-            {
-                MessageHelper.log("MainLoop DataService","Inizio acquisizione numero " + cont);
-                myLightSensor       .registerLightSensor();
-                myMotionSensor      .registerMotionSensor();
-                soundMeter          .start();
-                pause(500);//mezzo secondo per permetere di registrare corretamente i sensori
+            MessageHelper.log("DataService","Acquisizione dati in corso");
+            myLightSensor       .registerLightSensor();
+            myMotionSensor      .registerMotionSensor();
+            soundMeter          .start();
+
+            try {
+                    Thread.sleep(100);//mezzo secondo per permetere di registrare corretamente i sensori
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
 
 
-                String light    = String.valueOf(myLightSensor.getValue());
-                String motion   = String.valueOf(myMotionSensor.getValue());
-                String sound    = String.valueOf(soundMeter.getAmplitude());
-                String plugged  = String.valueOf(isPhonePluggedIn());
-                String locked   = String.valueOf(isPhoneLocked());
+
+            String light    = String.valueOf(myLightSensor.getValue());
+            String motion   = String.valueOf(myMotionSensor.getValue());
+            String sound    = String.valueOf(soundMeter.getAmplitude());
+            String plugged  = String.valueOf(isPhonePluggedIn());
+            String locked   = String.valueOf(isPhoneLocked());
 
 
-                this.salva(light, motion, sound, plugged, locked);
+            this.salva(light, motion, sound, plugged, locked);
 
-                //popolo la tabella mandando un messaggio di broadcast
-                Intent intent = new Intent("evento-popola-tabella");
-                intent.putExtra("light",light);
-                intent.putExtra("motion",motion);
-                intent.putExtra("sound",sound);
+            //popolo la tabella mandando un messaggio di broadcast
+            Intent intent = new Intent("evento-popola-tabella");
+            intent.putExtra("light",light);
+            intent.putExtra("motion",motion);
+            intent.putExtra("sound",sound);
 
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-                myLightSensor       .unregisterLightSensor();
-                myMotionSensor      .unregisterMotionSensor();
-                soundMeter          .stop();
+            myLightSensor       .unregisterLightSensor();
+            myMotionSensor      .unregisterMotionSensor();
+            soundMeter          .stop();
 
-                MessageHelper.log("MainLoop DataService","Fine Acquisizione");
-                pause(600000);//aspetto
-                cont++;
-            }
+            MessageHelper.log("MainLoop DataService","Fine Acquisizione");
+            //pause(600000);//aspetto
 
         }
 
@@ -90,12 +92,11 @@ public class DataService extends IntentService  {
         @Override
         public void onDestroy() {
             MessageHelper.log("Data_SERVICE", "Distruzione Service");
-            trigger=false;
             super.onDestroy();
         }
 
 
-        private void pause(int milllisec) {
+        /*private void pause(int milllisec) {
             try {
                 Thread.sleep(milllisec);
             }
@@ -103,7 +104,7 @@ public class DataService extends IntentService  {
             {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         public void salva(String light,String movement,String sound,String charging,String locked)
         {

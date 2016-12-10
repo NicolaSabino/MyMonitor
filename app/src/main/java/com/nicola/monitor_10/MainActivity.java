@@ -66,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        stato = sharedPref.getBoolean("sato",true);
+        stato = sharedPref.getBoolean("stato",true);
         playPauseState = sharedPref.getBoolean("playPauseState",true);
 
         fab     = (FloatingActionButton) findViewById(R.id.fab);
 
 
-        if(stato){
+        if(!stato){
             fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//ARANCIONE
             fab     .setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
         }else{
@@ -146,18 +146,10 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean("state",stato);
+        editor.putBoolean("stato",stato);
         editor.putBoolean("playPauseState",this.playPauseState);
         editor.apply();
 
-
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        MessageHelper.log("saveistance","DATI RECUPERATI");
 
 
     }
@@ -320,8 +312,8 @@ public class MainActivity extends AppCompatActivity {
 
                 elem0.setText(id);
                 elem1.setText(light);
-                elem2.setText(sound);
-                elem3.setText(movement);
+                elem2.setText(movement);
+                elem3.setText(sound);
                 elem4.setText(charging);
                 elem5.setText(locked);
                 elem6.setText(date);
@@ -429,9 +421,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void appendValuesTabella(float l,float s,float m){
         currentGraphIndex++;
-        light.appendData(new DataPoint(currentGraphIndex,l),true,30);
-        sound.appendData(new DataPoint(currentGraphIndex,s),true,30);
-        movement.appendData(new DataPoint(currentGraphIndex,m),true,30);
+        light.appendData(new DataPoint(currentGraphIndex,l),true,100);
+        sound.appendData(new DataPoint(currentGraphIndex,s),true,100);
+        movement.appendData(new DataPoint(currentGraphIndex,m),true,100);
 
     }
 

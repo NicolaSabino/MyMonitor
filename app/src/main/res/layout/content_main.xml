@@ -27,6 +27,7 @@
             android:layout_alignParentStart="true"
             android:padding="5dp"/>
 
+
         <com.jjoe64.graphview.GraphView
             android:layout_width="match_parent"
             android:layout_height="100dp"
@@ -43,6 +44,8 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:padding="5dp"/>
+
+
 
         <ListView
             android:layout_width="match_parent"

@@ -44,7 +44,7 @@ public class DataService extends IntentService  {
             soundMeter          .start();
 
             try {
-                    Thread.sleep(100);//mezzo secondo per permetere di registrare corretamente i sensori
+                    Thread.sleep(1000);//un secondo per permetere di registrare corretamente i sensori
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }

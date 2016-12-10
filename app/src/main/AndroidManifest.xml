@@ -3,6 +3,7 @@
     package="com.nicola.monitor_10">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -23,14 +24,15 @@
 
         <receiver
             android:name=".MyAlarmReceiver"
-            android:process=":remote" >
-        </receiver>
+            android:process=":remote"></receiver>
 
         <service
             android:name=".DataService"
-            android:exported="false">
-        </service>
+            android:exported="false"></service>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
 </manifest>

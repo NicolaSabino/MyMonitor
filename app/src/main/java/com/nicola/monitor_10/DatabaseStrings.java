@@ -13,9 +13,6 @@ public class DatabaseStrings {
     public static final String FIELD_LOCKED="locked";
     public static final String TBL_NAME="campioni";
     public static final String TBL_NAME_2="stato_utente";
-    public static final String TBL_NAME_3="isAlarmRegistered";
-
-    public static final String FIELD_STATE="awake";
     public static final String FIELD_TIME="Time";
     public static final String FIELD_DATE="Date";
 

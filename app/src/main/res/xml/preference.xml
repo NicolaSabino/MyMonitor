@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Acquisizione dati"
+        android:key="aquisizione_dati"
+        >
+        <ListPreference
+            android:key="freq"
+            android:entries="@array/syncFrequency"
+            android:summary="Granularità della campionatura"
+            android:entryValues="@array/FrequencyValues"
+            android:title="Frequenza "
+            android:icon="@drawable/timer"
+            android:defaultValue="15" />
+
+        <Preference android:title="Elimina dati"
+            android:key="@string/bottone"
+            android:icon="@drawable/db_alert"
+            android:summary="Pulisci il database delle acquisizioni"/>
+
+        <Preference android:title="Condividi Dati"
+            android:key="bottoneCondividi"
+            android:icon="@android:drawable/ic_menu_share"
+            android:summary="condividi le informazioni con un applicazione esterna"/>
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Grafici"
+        android:key="grafici">
+
+        <ListPreference
+        android:key="rend"
+        android:entries="@array/rendering"
+        android:summary="Numero dei valori dai rappresentare sul grafico"
+        android:entryValues="@array/renderingValues"
+        android:title="Rendering Grafico"
+        android:icon="@drawable/chart"
+        android:defaultValue="100" />
+
+        <SwitchPreference
+            android:icon="@drawable/x"
+            android:defaultValue="false"
+            android:title="Asse X"
+            android:summary="Mostra i valori sull'ascissa"
+            android:key="X" />
+
+        <SwitchPreference
+            android:icon="@drawable/y"
+            android:defaultValue="false"
+            android:title="Asse Y"
+            android:summary="Mostra i valori sull'ordinata"
+            android:key="Y" />
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="Sorgenti"
+        android:key="sorgenti">
+        <Preference
+            android:title="GitHub"
+            android:icon="@drawable/github"
+            >
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://github.com/NicolaSabino/Monitor_1.0" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

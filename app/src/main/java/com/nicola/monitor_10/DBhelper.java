@@ -38,7 +38,7 @@ public class DBhelper extends SQLiteOpenHelper {
 
         Log.i("DBHELPER","Creazione del db con la tabella " + DatabaseStrings.TBL_NAME );
 
-        /*String q2="CREATE TABLE "+
+        String q2="CREATE TABLE "+
                 DatabaseStrings.TBL_NAME_2      + " ( " +
                 DatabaseStrings.FIELD_ID        + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 DatabaseStrings.FIELD_STATE     + " BOOLEAN,"   +
@@ -46,7 +46,7 @@ public class DBhelper extends SQLiteOpenHelper {
                 DatabaseStrings.FIELD_TIME      + " VARCHAR )"
                 ;
         db.execSQL(q2);
-        */
+
     }
 
     @Override

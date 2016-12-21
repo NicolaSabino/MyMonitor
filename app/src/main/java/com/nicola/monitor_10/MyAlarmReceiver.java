@@ -11,6 +11,7 @@ import android.content.Intent;
 public class MyAlarmReceiver extends BroadcastReceiver {
     public static final int REQUEST_CODE = 12345;
     public static final String ACTION = "com.nicola.alarm";
+    private int freq;
 
     // Triggered by the Alarm periodically (starts the service to run task)
     @Override

@@ -5,8 +5,10 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
 /**
@@ -20,6 +22,7 @@ public class DataService extends IntentService  {
         private MyLightSensor       myLightSensor;
         private MyMotionSensor      myMotionSensor;
         private SoundMeter          soundMeter;
+        private int                 frequenza;
 
         //costruttore
         public DataService() {
@@ -73,7 +76,7 @@ public class DataService extends IntentService  {
             soundMeter          .stop();
 
             MessageHelper.log("MainLoop DataService","Fine Acquisizione");
-            //pause(600000);//aspetto
+
 
         }
 
@@ -95,16 +98,6 @@ public class DataService extends IntentService  {
             super.onDestroy();
         }
 
-
-        /*private void pause(int milllisec) {
-            try {
-                Thread.sleep(milllisec);
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }*/
 
         public void salva(String light,String movement,String sound,String charging,String locked)
         {
@@ -130,6 +123,8 @@ public class DataService extends IntentService  {
                 return false;
             }
         }
+
+
 
 }
 

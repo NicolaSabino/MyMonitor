@@ -6,17 +6,29 @@ package com.nicola.monitor_10;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
+import com.opencsv.CSVWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
 public class DbManager {
@@ -93,13 +105,14 @@ public class DbManager {
     }
 
 
-    /*public void changeState(boolean state) {
+    public void changeState(boolean state) {
 
         SQLiteDatabase db = dbhelper.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
         cv.put(DatabaseStrings.FIELD_STATE, state);
-        cv.put(DatabaseStrings.FIELD_TIME, "");
+        cv.put(DatabaseStrings.FIELD_TIME, getTime());
+        cv.put(DatabaseStrings.FIELD_DATE, getDate());
 
         try {
             db.insert(DatabaseStrings.TBL_NAME_2, null, cv);
@@ -107,78 +120,58 @@ public class DbManager {
         } catch (SQLiteException sqle) {
             sqle.printStackTrace();
         }
-    }*/
-
-    /*private String getTime() {
-        java.util.Calendar c = java.util.Calendar.getInstance();
-        java.util.Date d = c.getTime().
-        return d.toString();
-    }*/
-
-
-    /**
-     * Metodo che serve a condividere il file sql esternamente
-     */
-    public void shareDB(){
-        //todo da implementare
     }
 
-    /**
-     * Metodo che serve a condividere il file contenente le informazioni del db esternamente
-     */
-    public void sharingFile(){
-        //  CONFIGURAZIONE DELLE VARIABILI
-        String filename = "Data.csv";
-        File file = new File(context.getFilesDir(), filename);
-        FileOutputStream fileOutputStream;
-        String information = ""; // stringa che verrà convertita nei byte da scrivere sul file
 
+    public File esportaDB() {
 
-        //QUERY
-
-        Cursor c  = query();
-
-        for (int i = 0; i<c.getCount();i++){
-
-            //prendo le informazioni dalla query
-            String id           = c.getString(c.getColumnIndex(DatabaseStrings.FIELD_ID));
-            String light        = c.getString(c.getColumnIndex(DatabaseStrings.FIELD_LIGHT));
-            String movement     = c.getString(c.getColumnIndex(DatabaseStrings.FIELD_MOVEMENT));
-            String sound        = c.getString(c.getColumnIndex(DatabaseStrings.FIELD_SOUND));
-            String charging     = c.getString(c.getColumnIndex(DatabaseStrings.FIELD_CHARGING));
-            String locked       = c.getString(c.getColumnIndex(DatabaseStrings.FIELD_LOCKED));
-            String date         = c.getString(c.getColumnIndex(DatabaseStrings.FIELD_DATE));
-            String time         = c.getString(c.getColumnIndex(DatabaseStrings.FIELD_TIME));
-
-            //faccio un apend sulla stringa information
-            information += id +
-                    ";" + light +
-                    ";" + movement +
-                    ";" + sound +
-                    ";" + charging +
-                    ";" + locked +
-                    ";" + time + "\n";
-
-            //scorro al prossimo elemento
-            c.moveToNext();
+        File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+        if (!exportDir.exists()) {
+            exportDir.mkdirs();
         }
 
-        //BLOCCO SCRITTURA
+        File file = new File(exportDir, getDate() + ".csv");
+
         try {
-            fileOutputStream = context.openFileOutput(filename,Context.MODE_APPEND);
-            fileOutputStream.write(information.getBytes());
-            fileOutputStream.close();
-        }catch (Exception e){
-            e.printStackTrace();
+            file.createNewFile();
+            CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+            SQLiteDatabase db = dbhelper.getReadableDatabase();
+            Cursor curCSV = query();
+            csvWrite.writeNext(curCSV.getColumnNames());
+            while (curCSV.moveToNext()) {
+
+                String arrStr[] = {
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_ID)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_LIGHT)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_MOVEMENT)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_SOUND)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_CHARGING)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_LOCKED)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_DATE)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_TIME))
+                };
+                csvWrite.writeNext(arrStr);
+            }
+            csvWrite.close();
+            curCSV.close();
+            MessageHelper.toast(context,file.getPath());
+        } catch (Exception sqlEx) {
+            sqlEx.printStackTrace();
         }
+
+        return file;
     }
 
-    /*
-        Bisogna liberare memoria
-     */
-    public void deleteFile(){
+    public void sharing(){
 
+        Intent sharingIntent = new Intent();
+        sharingIntent.setAction(Intent.ACTION_SEND);
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(esportaDB()));
+        sharingIntent.setType("text/csv");
+        sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(sharingIntent, "Scegli come condividere il file"));
     }
+
 
     public String getDate(){
         Calendar c = Calendar.getInstance();
@@ -195,5 +188,7 @@ public class DbManager {
         String formattedTime = df.format(c.getTime());
         return formattedTime;
     }
+
+
 
 }

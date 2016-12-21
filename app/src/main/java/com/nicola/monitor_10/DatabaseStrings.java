@@ -15,5 +15,6 @@ public class DatabaseStrings {
     public static final String TBL_NAME_2="stato_utente";
     public static final String FIELD_TIME="Time";
     public static final String FIELD_DATE="Date";
+    public static final String FIELD_STATE="State";
 
 }

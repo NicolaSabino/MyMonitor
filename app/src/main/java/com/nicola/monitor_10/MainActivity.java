@@ -1,6 +1,7 @@
 package com.nicola.monitor_10;
 
 import android.app.AlarmManager;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,6 +15,8 @@ import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -38,11 +41,13 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 
 import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.R.attr.key;
 
 /**
  * Main activity dell'applicazione
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     private boolean stato;
@@ -55,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
     private GraphView graph1,graph2,graph3;
     private int currentGraphIndex;
 
+    private int frequenza ;
+    private int numeroDatiGrafico;
+    private boolean AsseX;
+    private boolean AsseY;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        readSettings();
 
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         stato = sharedPref.getBoolean("stato",true);
@@ -115,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
         popolaGrafici();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReciver,new IntentFilter("evento-popola-tabella"));
-
-
     }
 
     private BroadcastReceiver mMessageReciver = new BroadcastReceiver() {
@@ -134,8 +144,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
+        readSettings();
         popolaTabella();
-        deleteNotification();
         MessageHelper.log("RESUME", "popolo la tabella");
     }
 
@@ -143,14 +153,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
 
         super.onSaveInstanceState(outState);
-
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean("stato",stato);
-        editor.putBoolean("playPauseState",this.playPauseState);
-        editor.apply();
-
-
+        saveState();
 
     }
 
@@ -160,10 +163,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    /**
-     * Passo da Buongiorno a buonanotte e viceversa
-     * @param view
-     */
     private void cambiastato(View view) {
         //se stavo dormento
         if(stato){
@@ -179,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
         MessageHelper.log("SWITCH_STATE", stato + " -> " + !stato);
         stato = !stato; //cambio lo stato dell'utente
-        /*db.changeState(stato); */ //salvo il nuovo stato nel database
+        db.changeState(stato);
     }
 
     @Override
@@ -198,24 +197,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * Metodo che cattura la selezione degli elementi sulla ActionBar da parte dell'utente
-     * @param item
-     * @return
-     */
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
-        }
-
-        if (id == R.id.clearData){
-            db.deleteTables();
-            popolaTabella();
-            MessageHelper.toast(this,"Informazioni eliminate correttamente");
+            Intent intent = new Intent(this,SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -232,9 +222,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Metodo che gestisce il pulsante start stop della toolbar
-     */
+
     public void startStop(){
 
         ActionMenuItemView x = (ActionMenuItemView) findViewById(R.id.alarmState);
@@ -363,22 +351,22 @@ public class MainActivity extends AppCompatActivity {
         graph1.getViewport().setXAxisBoundsManual(true);
         graph1.getViewport().setMinX(1);
         graph1.getViewport().setMaxX(20);
-        graph1.getGridLabelRenderer().setHorizontalLabelsVisible(false);
-        graph1.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        graph1.getGridLabelRenderer().setHorizontalLabelsVisible(AsseX);
+        graph1.getGridLabelRenderer().setVerticalLabelsVisible(AsseY);
         graph1.setTitleColor(Color.rgb(255,193,7));
 
         graph2.getViewport().setXAxisBoundsManual(true);
         graph2.getViewport().setMinX(1);
         graph2.getViewport().setMaxX(20);
-        graph2.getGridLabelRenderer().setHorizontalLabelsVisible(false);
-        graph2.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        graph2.getGridLabelRenderer().setHorizontalLabelsVisible(AsseX);
+        graph2.getGridLabelRenderer().setVerticalLabelsVisible(AsseY);
         graph2.setTitleColor(Color.rgb(48,63,159));
 
         graph3.getViewport().setXAxisBoundsManual(true);
         graph3.getViewport().setMinX(1);
         graph3.getViewport().setMaxX(20);
-        graph3.getGridLabelRenderer().setHorizontalLabelsVisible(false);
-        graph3.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        graph3.getGridLabelRenderer().setHorizontalLabelsVisible(AsseX);
+        graph3.getGridLabelRenderer().setVerticalLabelsVisible(AsseY);
         graph3.setTitleColor(Color.rgb(230,74,25));
 
         graph1.setTitle("Light");
@@ -388,11 +376,6 @@ public class MainActivity extends AppCompatActivity {
         graph1.getViewport().setScrollable(true);
         graph2.getViewport().setScrollable(true);
         graph3.getViewport().setScrollable(true);
-
-
-
-
-
 
         graph1.addSeries(light);
         graph2.addSeries(sound);
@@ -409,9 +392,9 @@ public class MainActivity extends AppCompatActivity {
             if(crs.moveToFirst()){
                 for (int i=0;i<crs.getCount();i++) {
                     String id = crs.getString(0);
-                    light.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(1)),true,30);
-                    sound.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(2)),true,30);
-                    movement.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(3)),true,30);
+                    light.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(1)),true,numeroDatiGrafico);
+                    sound.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(2)),true,numeroDatiGrafico);
+                    movement.appendData(new DataPoint(Integer.valueOf(id),crs.getDouble(3)),true,numeroDatiGrafico);
                     crs.moveToNext();
                     currentGraphIndex=Integer.valueOf(id);
                 }
@@ -421,9 +404,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void appendValuesTabella(float l,float s,float m){
         currentGraphIndex++;
-        light.appendData(new DataPoint(currentGraphIndex,l),true,100);
-        sound.appendData(new DataPoint(currentGraphIndex,s),true,100);
-        movement.appendData(new DataPoint(currentGraphIndex,m),true,100);
+        light.appendData(new DataPoint(currentGraphIndex,l),true,numeroDatiGrafico);
+        sound.appendData(new DataPoint(currentGraphIndex,s),true,numeroDatiGrafico);
+        movement.appendData(new DataPoint(currentGraphIndex,m),true,numeroDatiGrafico);
 
     }
 
@@ -437,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestPermission() {
         ActivityCompat.requestPermissions(MainActivity.this, new
-                String[]{RECORD_AUDIO}, 1);
+                String[]{RECORD_AUDIO,WRITE_EXTERNAL_STORAGE}, 1);
     }
 
     @Override
@@ -461,56 +444,23 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
-        if(!playPauseState){
-            generateNotification(this.getApplicationContext(),
-                    "L'applicazione acquisirà dati in background!");
-            moveTaskToBack(true);
-        }else{
-            super.onBackPressed();
-        }
+        saveState();
+        super.onBackPressed();
     }
 
     @Override
     protected void onPause() {
-        if(!playPauseState){
-            generateNotification(this.getApplicationContext(),
-                    "L'applicazione sta continuando ad acquisire dati in background!");
-        }
         super.onPause();
     }
 
-
-
-
-
-    private static void generateNotification(Context context, String message){
-
-        int mNotificationId = 001;
-
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentTitle(context.getString(R.string.app_name))
-                .setContentIntent(intent)
-                .setPriority(5) //private static final PRIORITY_HIGH = 5;
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_VIBRATE);
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(001, mBuilder.build());
+    public void saveState(){
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("stato",stato);
+        editor.putBoolean("playPauseState",this.playPauseState);
+        editor.apply();
     }
 
-
-    public void deleteNotification() {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(001);
-    }
-
-    // Setup a recurring alarm every half hour
     public void scheduleAlarm() {
         // Costruisco un intent che eseguirà l'AlarmReceiver
         Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
@@ -523,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
         // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
         // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,firstMillis,
-                1000 * 120 , pIntent);
+                1000 * 60 * frequenza , pIntent);
     }
 
     public void cancelAlarm() {
@@ -534,4 +484,26 @@ public class MainActivity extends AppCompatActivity {
         alarm.cancel(pIntent);
     }
 
+    public void readSettings(){
+
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String f    = sharedpreferences.getString("freq","5");
+        String nD   = sharedpreferences.getString("rend","100");
+
+        frequenza           = Integer.parseInt(f);
+        numeroDatiGrafico   = Integer.parseInt(nD);
+        AsseX               =   sharedpreferences.getBoolean("X",false);
+        AsseY               =   sharedpreferences.getBoolean("Y",false);
+
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
+        if (s.equals(frequenza) && !playPauseState) {
+            cancelAlarm();
+            scheduleAlarm();
+        }
+    }
 }

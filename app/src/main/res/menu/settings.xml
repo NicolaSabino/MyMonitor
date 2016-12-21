@@ -13,15 +13,9 @@
         app:showAsAction="ifRoom"
         />-->
     <item
-        android:id="@+id/alarmState"
-        android:icon="@android:drawable/ic_media_play"
-        android:title="play/stop"
-        app:showAsAction="ifRoom"/>
-    
+        android:id="@+id/home"
+        android:icon="@drawable/back"
+        android:title="home"
+        app:showAsAction="always"/>
 
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
 </menu>

@@ -51,6 +51,16 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
+        Preference bottone2 = (Preference)findPreference("bottoneCondividi2");
+        bottone2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                DbManager dbManager = new DbManager(getActivity());
+                dbManager.sharing2();
+                return true;
+            }
+        });
+
     }
 
 

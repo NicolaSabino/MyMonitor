@@ -92,6 +92,19 @@ public class DbManager {
         return crs;
     }
 
+
+    public Cursor reverseQuery2(){
+        Cursor crs = null;
+        try {
+            SQLiteDatabase db = dbhelper.getReadableDatabase();
+            String myQuery = "SELECT * FROM " + DatabaseStrings.TBL_NAME_2 + " order by " + DatabaseStrings.FIELD_ID;
+            crs = db.rawQuery(myQuery, null);
+        } catch (SQLiteException sqle) {
+            sqle.printStackTrace();
+        }
+        return crs;
+    }
+
     public Cursor reverseQuery(){
         Cursor crs = null;
         try {
@@ -136,17 +149,52 @@ public class DbManager {
             file.createNewFile();
             CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
             SQLiteDatabase db = dbhelper.getReadableDatabase();
-            Cursor curCSV = query();
+            Cursor curCSV = reverseQuery();
             csvWrite.writeNext(curCSV.getColumnNames());
             while (curCSV.moveToNext()) {
 
                 String arrStr[] = {
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_ID)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_LIGHT)),
-                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_MOVEMENT)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_SOUND)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_MOVEMENT)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_CHARGING)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_LOCKED)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_DATE)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_TIME))
+                };
+                csvWrite.writeNext(arrStr);
+            }
+            csvWrite.close();
+            curCSV.close();
+            MessageHelper.toast(context,file.getPath());
+        } catch (Exception sqlEx) {
+            sqlEx.printStackTrace();
+        }
+
+        return file;
+    }
+
+    public File esportaDB2() {
+
+        File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+        if (!exportDir.exists()) {
+            exportDir.mkdirs();
+        }
+
+        File file = new File(exportDir, getDate() + "_check.csv");
+
+        try {
+            file.createNewFile();
+            CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+            SQLiteDatabase db = dbhelper.getReadableDatabase();
+            Cursor curCSV = reverseQuery2();
+            csvWrite.writeNext(curCSV.getColumnNames());
+            while (curCSV.moveToNext()) {
+
+                String arrStr[] = {
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_ID)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_STATE)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_DATE)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_TIME))
                 };
@@ -167,6 +215,16 @@ public class DbManager {
         Intent sharingIntent = new Intent();
         sharingIntent.setAction(Intent.ACTION_SEND);
         sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(esportaDB()));
+        sharingIntent.setType("text/csv");
+        sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(sharingIntent, "Scegli come condividere il file"));
+    }
+
+    public void sharing2(){
+
+        Intent sharingIntent = new Intent();
+        sharingIntent.setAction(Intent.ACTION_SEND);
+        sharingIntent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(esportaDB2()));
         sharingIntent.setType("text/csv");
         sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(sharingIntent, "Scegli come condividere il file"));

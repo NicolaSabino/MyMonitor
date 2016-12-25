@@ -24,6 +24,11 @@
             android:icon="@android:drawable/ic_menu_share"
             android:summary="condividi le informazioni con un applicazione esterna"/>
 
+        <Preference android:title="Condividi Dati per la verifica"
+            android:key="bottoneCondividi2"
+            android:icon="@android:drawable/ic_menu_share"
+            android:summary="condividi il feedback del bottone Buongiorno-Buonanotte"/>
+
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Grafici"

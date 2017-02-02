@@ -60,7 +60,7 @@ public class DataService extends IntentService  {
             String plugged  = String.valueOf(isPhonePluggedIn());
             String locked   = String.valueOf(isPhoneLocked());
 
-
+            //todo controllare il corretto ordine di locked e plugged
             this.salva(light, motion, sound, plugged, locked);
 
             //popolo la tabella mandando un messaggio di broadcast
@@ -75,7 +75,7 @@ public class DataService extends IntentService  {
             myMotionSensor      .unregisterMotionSensor();
             soundMeter          .stop();
 
-            MessageHelper.log("MainLoop DataService","Fine Acquisizione");
+            MessageHelper.log("DataService","Fine Acquisizione");
 
 
         }

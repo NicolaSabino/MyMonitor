@@ -76,32 +76,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setSupportActionBar(toolbar);
 
         readSettings();
-
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        stato = sharedPref.getBoolean("stato",true);
-        playPauseState = sharedPref.getBoolean("playPauseState",true);
-
-        fab     = (FloatingActionButton) findViewById(R.id.fab);
-
-
-        if(!stato){
-            fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//ARANCIONE
-            fab     .setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
-        }else{
-            fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(48,63,159)));//blu
-            fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
-        }
-
-
-
-
-        fab     .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cambiastato(view);
-            }
-        });
-
+        fabConfig();
 
 
         //settaggio dell'intent che gestisce l'acquisizione dati
@@ -121,12 +96,30 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         graph3 = (GraphView) findViewById(R.id.graph3);
 
 
-
         initGrafici();
         currentGraphIndex = 0;
         popolaGrafici();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReciver,new IntentFilter("evento-popola-tabella"));
+    }
+
+    private void fabConfig(){
+
+        fab     = (FloatingActionButton) findViewById(R.id.fab);
+        if(!stato){
+            fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//ARANCIONE
+            fab     .setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
+        }else{
+            fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(48,63,159)));//blu
+            fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
+        }
+
+        fab     .setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cambiastato(view);
+            }
+        });
     }
 
     private BroadcastReceiver mMessageReciver = new BroadcastReceiver() {
@@ -235,7 +228,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 MessageHelper.log("ICONA","NULL");
             }
 
-
             //this.startService(servizio);
             scheduleAlarm();
 
@@ -288,6 +280,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 String time         = crs.getString(crs.getColumnIndex(DatabaseStrings.FIELD_TIME));
                 String date         = crs.getString(crs.getColumnIndex(DatabaseStrings.FIELD_DATE));
 
+
+
+
+
+
                 //stampo le informazioni nella riga della tabella
                 TextView elem0 = (TextView) v.findViewById(R.id.idContent);
                 TextView elem1 = (TextView) v.findViewById(R.id.lightContent);
@@ -302,10 +299,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 elem1.setText(light);
                 elem2.setText(movement);
                 elem3.setText(sound);
-                elem4.setText(charging);
-                elem5.setText(locked);
                 elem6.setText(date);
                 elem7.setText(time);
+
+                //modifico charging e loked
+                String _charging, _locked;
+
+                if(Boolean.parseBoolean(charging)){
+                    elem4.setText("\u26A1");
+                }else{
+                    elem4.setText("");
+                }
+
+
+                if(Boolean.parseBoolean(locked)){
+                    elem5.setText("\u26BF");
+                }else{
+                    elem5.setText("");
+                }
+
+
+
 
 
             }
@@ -464,12 +478,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void scheduleAlarm() {
         // Costruisco un intent che eseguirà l'AlarmReceiver
         Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+
         // Creo un  PendingIntent che verrà attivato quando l'allarme si spegne
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        // Configuro un allarme periodico ogni 5 secondi
+
         long firstMillis = System.currentTimeMillis(); // alarm is set right away
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
         // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
         // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,firstMillis,
@@ -487,10 +503,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void readSettings(){
 
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
 
-        String f    = sharedpreferences.getString("freq","5");
-        String nD   = sharedpreferences.getString("rend","100");
-
+        String f            = sharedpreferences.getString("freq","5");
+        String nD           = sharedpreferences.getString("rend","100");
+        stato               = sharedPref.getBoolean("stato",true);
+        playPauseState      = sharedPref.getBoolean("playPauseState",true);
         frequenza           = Integer.parseInt(f);
         numeroDatiGrafico   = Integer.parseInt(nD);
         AsseX               =   sharedpreferences.getBoolean("X",false);

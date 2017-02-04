@@ -30,7 +30,8 @@ public class MyMotionSensor {
     public boolean registerMotionSensor(){
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
             sensore = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            mSensorManager.registerListener(LightSensorListener,sensore, SensorManager.SENSOR_DELAY_GAME);
+            //todo controllare SENSOR_DELay
+            mSensorManager.registerListener(LightSensorListener,sensore, SensorManager.SENSOR_DELAY_NORMAL);
             return true;
         }
         else {

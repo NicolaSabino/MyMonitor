@@ -158,8 +158,8 @@ public class DbManager {
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_LIGHT)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_SOUND)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_MOVEMENT)),
-                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_CHARGING)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_LOCKED)),
+                        curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_CHARGING)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_DATE)),
                         curCSV.getString(curCSV.getColumnIndex(DatabaseStrings.FIELD_TIME))
                 };

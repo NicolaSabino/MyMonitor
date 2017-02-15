@@ -508,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         String f            = sharedpreferences.getString("freq","15");
         String nD           = sharedpreferences.getString("rend","100");
         stato               = sharedPref.getBoolean("stato",false);
-        playPauseState      = sharedPref.getBoolean("playPauseState",true);
+        playPauseState      = sharedPref.getBoolean("playPauseState",false);
         frequenza           = Integer.parseInt(f);
         numeroDatiGrafico   = Integer.parseInt(nD);
         AsseX               =   sharedpreferences.getBoolean("X",false);

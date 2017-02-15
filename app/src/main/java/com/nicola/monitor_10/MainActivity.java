@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         readSettings();
         fabConfig();
 
+        initStartStop();
+
 
         //settaggio dell'intent che gestisce l'acquisizione dati
         this.servizio = new Intent(this,DataService.class);
@@ -224,6 +226,28 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
 
+    public void initStartStop(){
+
+        ActionMenuItemView x = (ActionMenuItemView) findViewById(R.id.alarmState);
+
+        if(playPauseState){
+
+            if (x != null) {
+                x.setIcon(getResources().getDrawable(android.R.drawable.ic_media_pause,getTheme()));
+            }else {
+                MessageHelper.log("ICONA","NULL");
+            }
+
+        }else {
+
+            if (x != null) {
+                x.setIcon(getResources().getDrawable(android.R.drawable.ic_media_play, getTheme()));
+            } else {
+                MessageHelper.log("ICONA", "NULL");
+            }
+        }
+    }
+
     public void startStop(){
 
         ActionMenuItemView x = (ActionMenuItemView) findViewById(R.id.alarmState);
@@ -243,6 +267,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             MessageHelper.log("TOOLBAR","Play -> inizio acquisizione dati");
             MessageHelper.toast(getApplicationContext(),"Inizio acquisizione dati");
 
+            playPauseState = false;
+            saveState();
+
         }else{
 
             if (x != null) {
@@ -258,9 +285,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //messaggi
             MessageHelper.log("TOOLBAR","Pause -> acquisizione dati sospesa");
             MessageHelper.toast(getApplicationContext(),"Acquisizione dati interrotta");
-        }
 
-        playPauseState = !playPauseState;
+            playPauseState = true;
+            saveState();
+        }
     }
 
     public void popolaTabella() {
@@ -516,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         String f            = sharedpreferences.getString("freq","15");
         String nD           = sharedpreferences.getString("rend","100");
         stato               = sharedPref.getBoolean("stato",false);
-        playPauseState      = sharedPref.getBoolean("playPauseState",false);
+        playPauseState      = sharedPref.getBoolean("playPauseState",true);
         frequenza           = Integer.parseInt(f);
         numeroDatiGrafico   = Integer.parseInt(nD);
         AsseX               =   sharedpreferences.getBoolean("X",false);

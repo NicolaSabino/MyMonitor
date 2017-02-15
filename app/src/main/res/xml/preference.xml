@@ -12,7 +12,7 @@
             android:entryValues="@array/FrequencyValues"
             android:title="Frequenza "
             android:icon="@drawable/timer"
-            android:defaultValue="15" />
+            android:defaultValue="5" />
 
         <Preference android:title="Elimina dati"
             android:key="@string/bottone"

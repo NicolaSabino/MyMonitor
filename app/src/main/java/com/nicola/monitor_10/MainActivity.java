@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -163,10 +164,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//arancione
             fab.setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
 
+            //notifica
+            deleteNotification();
+            generateNotification(this,"Ricorda di darmi la buonanotte \u263A",R.drawable.sun);
+
         }else{
             MessageHelper.snak(view,"Buonanotte");
             fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(48,63,159)));//blu
             fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
+            //notifica
+            deleteNotification();
+            generateNotification(this,"Ricorda di darmi il buongionro \u263b",R.drawable.moon);
         }
 
         MessageHelper.log("SWITCH_STATE", stato + " -> " + !stato);
@@ -524,4 +532,32 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             scheduleAlarm();
         }
     }
+
+    private static void generateNotification(Context context, String message, int res){
+
+        int mNotificationId = 001;
+
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(res)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentIntent(intent)
+                .setPriority(5) //private static final PRIORITY_HIGH = 5;
+                .setContentText(message)
+                .setAutoCancel(false);
+
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(001, mBuilder.build());
+    }
+
+    public void deleteNotification() {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(001);
+    }
+
+
+
 }

@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
             //notifica
             deleteNotification();
-            generateNotification(this,"Ricorda di darmi il buongionro \u263b",R.drawable.moon);
+            generateNotification(this,"Ricorda di darmi il buongiorno \u263b",R.drawable.moon);
         }
 
         MessageHelper.log("SWITCH_STATE", stato + " -> " + !stato);

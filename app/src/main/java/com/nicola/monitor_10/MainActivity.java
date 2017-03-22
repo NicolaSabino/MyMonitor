@@ -15,6 +15,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.icu.text.DecimalFormat;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -41,6 +42,16 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+import weka.classifiers.Classifier;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.FastVector;
+import weka.core.Instance;
+import weka.core.Instances;
+
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.R.attr.key;
@@ -65,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private int numeroDatiGrafico;
     private boolean AsseX;
     private boolean AsseY;
+    private boolean AiState;
 
 
     @Override
@@ -109,20 +121,33 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void fabConfig(){
 
         fab     = (FloatingActionButton) findViewById(R.id.fab);
-        if(!stato){
-            fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//ARANCIONE
-            fab     .setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
-        }else{
-            fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(48,63,159)));//blu
-            fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
-        }
+        // se non è abilitata la classificazione rendo il fab cliccabile
+        if(!AiState) {
 
-        fab     .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cambiastato(view);
+            if(!stato){
+                fab     .setBackgroundTintList(ColorStateList.valueOf(Color.rgb(255,193,7)));//ARANCIONE
+                fab     .setImageDrawable(getResources().getDrawable(R.drawable.sun,getTheme()));
+            }else{
+                fab.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(48,63,159)));//blu
+                fab.setImageDrawable(getResources().getDrawable(R.drawable.moon,getTheme()));
             }
-        });
+
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    cambiastato(view);
+                }
+            });
+        }else {
+            fab     .setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FF5722")));//ARANCIONE
+            fab     .setImageDrawable(getResources().getDrawable(R.drawable.ic_action_name,getTheme()));
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    MessageHelper.snak(view,"È attiva l'inteligenza artificiale");
+                }
+            });
+        }
     }
 
     private BroadcastReceiver mMessageReciver = new BroadcastReceiver() {
@@ -293,10 +318,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public void popolaTabella() {
 
+
+
         //seleziona le info dal database e ripongo il risultato in un oggetto cursore
         final Cursor crs = db.query();
 
-        CursorAdapter adapter = new CursorAdapter(this, crs, 0) {
+
+        CursorAdapter adapter = new CursorAdapter(this,crs,0) {
             @Override
             public View newView(Context context, Cursor cursor, ViewGroup parent) {
                 View v = getLayoutInflater().inflate(R.layout.custom_row_table,null);
@@ -320,8 +348,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
 
 
-
                 //stampo le informazioni nella riga della tabella
+                TextView elem8 = (TextView) v.findViewById(R.id.predictionContent);
+
                 TextView elem0 = (TextView) v.findViewById(R.id.idContent);
                 TextView elem1 = (TextView) v.findViewById(R.id.lightContent);
                 TextView elem2 = (TextView) v.findViewById(R.id.movContent);
@@ -339,7 +368,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 elem7.setText(time);
 
                 //modifico charging e loked
-                String _charging, _locked;
 
                 if(Boolean.parseBoolean(charging)){
                     elem4.setText("\u26A1");
@@ -352,6 +380,74 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     elem5.setText("\u26BF");
                 }else{
                     elem5.setText("");
+                }
+
+
+                //se la classificazione è attivata popolo con la predizione altrimenti non scrivo niente
+                if(AiState) {
+
+                    int NUMERO_DI_ATTRIBUTI = 6; // 5 + 1 classe
+                    int NUMERO_DI_ISTANZE = 1;
+
+
+                    // creo degli oggetti attributo
+                    Attribute a0    = new Attribute("light");
+                    Attribute a1    = new Attribute("sound");
+                    Attribute a2    = new Attribute("movement");
+                    Attribute a3    = new Attribute("locked");
+                    Attribute a4    = new Attribute("charging");
+                    Attribute aClass    = new Attribute("state");
+
+
+                    //creo un vettore di attributi
+                    FastVector fastVector = new FastVector(NUMERO_DI_ATTRIBUTI);
+                    fastVector.addElement(a0);
+                    fastVector.addElement(a1);
+                    fastVector.addElement(a2);
+                    fastVector.addElement(a3);
+                    fastVector.addElement(a4);
+                    fastVector.addElement(aClass);
+
+                    Instances testSet = new Instances("Insieme di istanze",fastVector,NUMERO_DI_ISTANZE);
+                    testSet.setClassIndex(5);
+
+                    //istanza per la classificazione sicuramente il risultato è 1
+                    Instance instance = new DenseInstance(fastVector.size());
+
+                    instance.setValue(a0,Double.parseDouble(light));
+                    instance.setValue(a1,Double.parseDouble(sound));
+                    instance.setValue(a2,Double.parseDouble(movement));
+                    instance.setValue(a3,(Boolean.parseBoolean(locked)) ? 1 : 0);
+                    instance.setValue(a4,(Boolean.parseBoolean(charging)) ? 1 : 0);
+
+                    testSet.add(instance);
+
+                    double prediction;
+
+                    try {
+
+                        Classifier classifier = (Classifier) weka.core.SerializationHelper.read(getAssets().open("M_S.model"));
+                        prediction = classifier.classifyInstance(testSet.instance(0)); //predizione
+
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                        prediction = -1;
+                    }
+
+                    java.text.DecimalFormat df = new java.text.DecimalFormat("##.##");
+
+                    if(prediction >= 0.5){ //è stato predetto che sono sveglio
+
+                        elem8.setText("\u263C " + df.format(prediction*100) + "%");
+                    }else{ // è stato predetto che sto dormento
+
+                        elem8.setText("\u263D " + df.format(100 -(prediction*100)) +"%");
+                    }
+
+
+
+                }else {
+                    elem8.setText("");
                 }
 
 
@@ -547,8 +643,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         playPauseState      = sharedPref.getBoolean("playPauseState",true);
         frequenza           = Integer.parseInt(f);
         numeroDatiGrafico   = Integer.parseInt(nD);
-        AsseX               =   sharedpreferences.getBoolean("X",false);
-        AsseY               =   sharedpreferences.getBoolean("Y",false);
+        AsseX               = sharedpreferences.getBoolean("X",false);
+        AsseY               = sharedpreferences.getBoolean("Y",false);
+        AiState             = sharedpreferences.getBoolean("Classification",false);
 
     }
 
@@ -585,7 +682,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(001);
     }
-
 
 
 }

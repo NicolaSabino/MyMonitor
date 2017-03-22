@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <PreferenceCategory
+        android:title="Intelligenza artificiale"
+        android:key="ai"
+        >
+
+        <SwitchPreference
+            android:icon="@drawable/droide"
+            android:defaultValue="false"
+            android:title="Classificazione dei dati"
+            android:summary="Classificazione mediante alberi di decisione"
+            android:key="Classification" />
+
+
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:title="Acquisizione dati"
         android:key="aquisizione_dati"

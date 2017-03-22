@@ -24,19 +24,17 @@ public class DBhelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db)
     {
         String q="CREATE TABLE "+
-                DatabaseStrings.TBL_NAME        + " ( " +
-                DatabaseStrings.FIELD_ID        + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                DatabaseStrings.FIELD_LIGHT     + " DOUBLE,"    +
-                DatabaseStrings.FIELD_SOUND     + " DOUBLE,"    +
-                DatabaseStrings.FIELD_MOVEMENT  + " DOUBLE,"    +
-                DatabaseStrings.FIELD_LOCKED    + " BOOLEAN,"   +
-                DatabaseStrings.FIELD_CHARGING  + " BOOLEAN,"   +
-                DatabaseStrings.FIELD_DATE      + " VARCHAR,"   +
-                DatabaseStrings.FIELD_TIME      + " VARCHAR )"
+                DatabaseStrings.TBL_NAME            + " ( " +
+                DatabaseStrings.FIELD_ID            + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                DatabaseStrings.FIELD_LIGHT         + " DOUBLE,"    +
+                DatabaseStrings.FIELD_SOUND         + " DOUBLE,"    +
+                DatabaseStrings.FIELD_MOVEMENT      + " DOUBLE,"    +
+                DatabaseStrings.FIELD_LOCKED        + " BOOLEAN,"   +
+                DatabaseStrings.FIELD_CHARGING      + " BOOLEAN,"   +
+                DatabaseStrings.FIELD_DATE          + " VARCHAR,"   +
+                DatabaseStrings.FIELD_TIME          + " VARCHAR )"
                 ;
         db.execSQL(q);
-
-        Log.i("DBHELPER","Creazione del db con la tabella " + DatabaseStrings.TBL_NAME );
 
         String q2="CREATE TABLE "+
                 DatabaseStrings.TBL_NAME_2      + " ( " +

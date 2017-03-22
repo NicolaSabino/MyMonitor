@@ -1,5 +1,5 @@
 
-![immagine] (https://raw.githubusercontent.com/NicolaSabino/Monitor_1.0/master/immagine%20di%20presentazione%20app%20(1).png)
+![immagine](https://raw.githubusercontent.com/NicolaSabino/Monitor_1.0/master/immagine%20di%20presentazione%20app%20(1).png)
 
 
 **Progetto di tirocinio presso il laboratorio di telecomunicazioni dell'Università politecnico delle marche**
